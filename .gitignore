@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.venv/
+venv/
+.env
+.ipynb_checkpoints/
+
+# Data artifacts
+/data/raw/
+/data/processed/
+/data/interim/
+/models/
+
+# Reports: keep HTML deliverables, ignore data files
+/reports/*.parquet
+/reports/*.csv
+/reports/*.json
+
+# Internal / operational files
+/_private/
+
+# Legacy notebook artifacts not intended for v1 public publication
+notebooks/*.executed.ipynb
+notebooks/*.audit_run.ipynb
+notebooks/borrador notebook 01.txt
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Local runtime
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

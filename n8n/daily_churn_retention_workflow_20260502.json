@@ -1,0 +1,66 @@
+{
+  "name": "Daily Churn Retention Actions",
+  "schedule": "0 2 * * * America/Sao_Paulo",
+  "description": "Daily orchestration blueprint for VivaMarket Brasil churn retention actions.",
+  "nodes": [
+    {
+      "id": 1,
+      "name": "Cron Trigger",
+      "type": "n8n-nodes-base.cron"
+    },
+    {
+      "id": 2,
+      "name": "Read Predictions",
+      "type": "n8n-nodes-base.readBinaryFile"
+    },
+    {
+      "id": 3,
+      "name": "Merge Explainability",
+      "type": "n8n-nodes-base.merge"
+    },
+    {
+      "id": 4,
+      "name": "Risk Switch",
+      "type": "n8n-nodes-base.switch"
+    },
+    {
+      "id": 5,
+      "name": "Generate Coupon",
+      "type": "n8n-nodes-base.httpRequest"
+    },
+    {
+      "id": 6,
+      "name": "Send Email",
+      "type": "n8n-nodes-base.sendGrid"
+    },
+    {
+      "id": 7,
+      "name": "Send Push",
+      "type": "n8n-nodes-base.oneSignal"
+    },
+    {
+      "id": 8,
+      "name": "Send SMS",
+      "type": "n8n-nodes-base.twilio"
+    },
+    {
+      "id": 9,
+      "name": "Log Actions",
+      "type": "n8n-nodes-base.postgres"
+    },
+    {
+      "id": 10,
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.emailSend"
+    }
+  ],
+  "policy": {
+    "max_contacts_30d": 4,
+    "sms_only_if_email_not_opened": true,
+    "control_group_high_risk_share": 0.15,
+    "time_windows_local": {
+      "email": "09:00-20:00",
+      "sms": "10:00-19:00"
+    }
+  }
+}
