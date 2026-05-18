@@ -1,0 +1,58 @@
+{
+  "name": "VivaMarket Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "aaa00001-0000-0000-0000-000000000001",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        400,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "architect.openclaw@gmail.com",
+        "toEmail": "albertosvallejo@gmail.com",
+        "subject": "={{ \"⚠️ VivaMarket Churn Workflow ERROR — \" + $now.format('yyyy-MM-dd') }}",
+        "html": "=<p><strong>Error en el workflow de retención VivaMarket.</strong></p>\n<p><strong>Workflow:</strong> {{ $json.workflow?.name ?? 'desconocido' }}</p>\n<p><strong>Nodo:</strong> {{ $json.execution?.lastNodeExecuted ?? 'desconocido' }}</p>\n<p><strong>Fecha:</strong> {{ $now.format('yyyy-MM-dd HH:mm:ss') }}</p>\n<p><strong>Detalle:</strong> {{ $json.execution?.error?.message ?? 'sin detalle' }}</p>",
+        "options": {}
+      },
+      "id": "aaa00001-0000-0000-0000-000000000002",
+      "name": "Send Error Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        640,
+        300
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "N4w7zDY1WD28R6by",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send Error Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "tags": []
+}

@@ -8,18 +8,19 @@ venv/
 .ipynb_checkpoints/
 
 # Data artifacts
-/data/raw/
 /data/processed/
 /data/interim/
 /models/
+/reports/
 
-# Reports: keep HTML deliverables, ignore data files
-/reports/*.parquet
-/reports/*.csv
-/reports/*.json
+# Raw data — source database never versioned
+data/raw/*.sqlite
 
 # Internal / operational files
 /_private/
+
+# n8n drafts — only named canonical workflow files are versioned
+n8n/*.jsonl
 
 # Legacy notebook artifacts not intended for v1 public publication
 notebooks/*.executed.ipynb
@@ -29,6 +30,7 @@ notebooks/borrador notebook 01.txt
 # OS / editors
 .DS_Store
 Thumbs.db
+desktop.ini
 .vscode/
 .idea/
 
@@ -36,6 +38,5 @@ Thumbs.db
 *.log
 
 # Local runtime
-*.sqlite
 *.sqlite-shm
 *.sqlite-wal

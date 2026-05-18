@@ -1,0 +1,4 @@
+https://www.kaggle.com/datasets/terencicp/e-commerce-dataset-by-olist-as-an-sqlite-database
+
+SQLite Browser:
+https://sqlitebrowser.org/dl/
