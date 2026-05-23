@@ -1,0 +1,12 @@
+risk_tier,top_driver_group,recommended_offer_type,rows_n,avg_probability,observed_churn_rate,avg_discount_pct
+HIGH,frequency,repeat_purchase_nurturing,530,0.9930293,0.9981132075471698,25.71698113207547
+HIGH,recency,reactivation_urgency,97,0.99173903,1.0,25.20618556701031
+HIGH,monetary,value_bundle_offer,43,0.99129647,1.0,25.58139534883721
+LOW,monetary,value_bundle_offer,843,0.7896476,0.9537366548042705,0.0
+LOW,frequency,repeat_purchase_nurturing,380,0.73181045,0.9815789473684211,0.0
+LOW,recency,reactivation_urgency,338,0.803816,0.9704142011834319,0.0
+LOW,other,value_bundle_offer,112,0.47591725,0.875,0.0
+MEDIUM,frequency,repeat_purchase_nurturing,505,0.9765602,1.0,12.0
+MEDIUM,monetary,value_bundle_offer,272,0.9721157,0.9816176470588235,12.0
+MEDIUM,recency,reactivation_urgency,217,0.97562474,0.9953917050691244,12.0
+MEDIUM,other,value_bundle_offer,9,0.9711436,1.0,12.0

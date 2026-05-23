@@ -7,26 +7,28 @@
 [![Scikit--learn](https://img.shields.io/badge/scikit--learn-Validation-F7931E.svg)](https://scikit-learn.org/)
 [![Jupyter](https://img.shields.io/badge/Jupyter-Notebook%20Pipeline-F37626.svg)](https://jupyter.org/)
 [![License](https://img.shields.io/badge/License-Personal%20Portfolio-blue.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-v1.0.0%20Baseline%20%7C%20v2%20+%20Phase%202%20Complete-orange.svg)]()
-[![Workflow](https://img.shields.io/badge/Workflow-Spec--Driven%20%2B%20Human%20Supervision-005090.svg)]()
+[![Status](https://img.shields.io/badge/Status-v1.0.0%20Baseline%20%7C%20v2%20+%20Phase%202%20Complete-orange.svg)](#version-note)
+[![Workflow](https://img.shields.io/badge/Workflow-Spec--Driven%20%2B%20Human%20Supervision-005090.svg)](#development-methodology)
 
 ---
 
 ## Executive Summary
 
-> ⚠️ **BEFORE YOU START — ANALYTICAL BASELINE NOTE**: This repository contains both the historical **v1.0.0 published baseline** and the current locally hardened **canonical v2 candidate**. The original v1 baseline should not be interpreted as a final analytical definition of churn for VivaMarket Brasil: the 90-day forward target was structurally too positive-heavy, which kept average precision near **0.994** while limiting business separability (ROC AUC ~**0.589** on the v1 test split). The current local v2 candidate materially improves ranking quality (**ROC AUC ~0.8016**) through a redesigned `V2C` formulation, but the target remains positive-heavy and should still be interpreted cautiously. This is not a model failure — it is a consequence of marketplace dynamics, one-time-buyer dominance, and the difficulty of defining a truly retainable customer population. The limitation is explicit and should be handled as a genuine business-first analytical design problem.
+> ⚠️ **BEFORE YOU START — ANALYTICAL BASELINE NOTE**: This repository contains both the historical **v1.0.0 published baseline** and the current synchronized **canonical V2C artifact line**. The original v1 baseline should not be interpreted as a final analytical definition of churn for VivaMarket Brasil: the 90-day forward target was structurally too positive-heavy, which kept average precision near **0.994** while limiting business separability (ROC AUC ~**0.589** on the v1 test split). The canonical V2C artifact line materially improves ranking quality (**ROC AUC ~0.8016**) through a redesigned `V2C` formulation, but the target remains positive-heavy and should still be interpreted cautiously. This is not a model failure — it is a consequence of marketplace dynamics, one-time-buyer dominance, and the difficulty of defining a truly retainable customer population. The limitation is explicit and should be handled as a genuine business-first analytical design problem.
 
 This is a **personal deep-dive project** built after completing a Master's in Data Science to gain hands-on experience with production-oriented churn modeling in a realistic marketplace setting. It implements a **complete end-to-end churn workflow** for VivaMarket Brasil, covering the full path from raw SQLite extraction to scored retention queues, explainability outputs, automation-ready payloads, and business-facing HTML reporting.
+
+The repository is intentionally framed as more than a model notebook chain: it now also documents the transition from pure analytical redesign into an **internal pilot / controlled operational activation baseline**, while keeping a clear boundary between that internal layer and any future fully hardened real-send customer-facing stack.
 
 The goal was to go beyond a typical academic churn notebook and build a pipeline that addresses the real challenges of marketplace churn: irregular purchase behavior, analytically complex target definition, temporal consistency requirements, and the need to translate model scores into operational business decisions.
 
 **Development approach:** This project was built using **The Architect (v1)**, a personal Spec-Driven DS framework developed alongside this project. Every notebook was analytically specified before being built, executed with OpenClaw agent support, and reviewed under explicit human supervision before the next step was started. The workflow prioritizes traceability, notebook-by-notebook QA, and clean versioned evolution over execution speed.
 
-**Current local v2 candidate — key metrics:**
+**Canonical V2C artifact line — key metrics:**
 
 | Metric | Value | Context |
 |:-------|:-----:|:--------|
-| ROC AUC (test split) | ~0.8016 | Canonical `V2C` candidate |
+| ROC AUC (test split) | ~0.8016 | Canonical `V2C` artifact line |
 | Average Precision | ~0.9937 | Still influenced by positive-heavy target |
 | Precision@Top 5% | 1.0000 | Held-out scored set |
 | Precision@Top 10% | ~0.9970 | Held-out scored set |
@@ -34,8 +36,10 @@ The goal was to go beyond a typical academic churn notebook and build a pipeline
 | Deployment prep | ✅ scoring package + smoke test | NB07 |
 | Orchestration | ✅ n8n workflow V9 — two-workflow architecture (main + error handler), executed end-to-end in production (Phase 2 internal orchestration, validated 2026-05-18) | NB08 |
 | Reporting | ✅ branded HTML dashboard | NB09 |
+| Model governance | ✅ Model Card (latest local publication layer) | Phase 3 |
+| ROI framing | ✅ scenario-based ROI layer for stakeholder discussion | Phase 3 |
 
-**Top churn driver families (current local candidate):**
+**Top churn driver families (canonical V2C artifact line):**
 
 | Driver family | Interpretation |
 |:--------------|:---------------|
@@ -50,7 +54,7 @@ The goal was to go beyond a typical academic churn notebook and build a pipeline
 
 ## Quick Start
 
-> **Current status:** NB01–NB09 complete with canonical executed notebooks. Phase 2 is complete: the n8n workflow (V9, two-workflow architecture) has been executed end-to-end in a real production environment. The historical v1 baseline is documented; the current local repository reflects the synchronized **canonical V2C candidate** with Docker support, tests, updated reporting, and verified Drive backup.
+> **Current status:** NB01–NB09 complete with canonical executed notebooks. Phase 2 is complete: the n8n workflow (V9, two-workflow architecture) has been executed end-to-end in a real production environment. The historical v1 baseline is documented; the current repository reflects the synchronized **canonical V2C artifact line** with Docker support, tests, updated reporting, and verified Drive backup. The current publication layer also includes a stronger Model Card and a scenario-based ROI layer aligned with an **internal-pilot-first / production-layer-later** roadmap.
 
 ### Running the notebook pipeline
 
@@ -253,7 +257,7 @@ This design allows the same customer to be observed at multiple lifecycle moment
 
 ### Modeling Logic
 
-The current synchronized local candidate uses the canonical **`V2C`** formulation:
+The current synchronized artifact line uses the canonical **`V2C`** formulation:
 
 - eligible base: `total_orders >= 2`
 - tenure rule: `tenure_days >= 90`
@@ -264,7 +268,7 @@ This formulation was chosen after a short controlled benchmark because it improv
 
 ### Orchestration Positioning
 
-The automation layer is implemented through **n8n**, which serves as the internal orchestration platform for Phase 2. The final architecture uses **two separate workflows**: the main pipeline (V9) and a dedicated error handler (`VivaMarket Error Handler`), connected through n8n's native Error Workflow mechanism in Settings. This two-workflow pattern avoids the known n8n issue where inline error nodes can be incorrectly auto-wired as main connections. Both workflows have been executed end-to-end in a real VPS environment, validating the full retention action pipeline from daily scoring through coupon generation, email and push notification dispatch, and database logging. A more hardened customer-facing delivery stack is scoped for Phase 3 once the underlying churn definition is analytically stable.
+The automation layer is implemented through **n8n**, which serves as the internal orchestration platform for Phase 2. The final architecture uses **two separate workflows**: the main pipeline (V9) and a dedicated error handler (`VivaMarket Error Handler`), connected through n8n's native Error Workflow mechanism in Settings. This two-workflow pattern avoids the known n8n issue where inline error nodes can be incorrectly auto-wired as main connections. Both workflows have been executed end-to-end in a real VPS environment, validating the full retention action pipeline from daily scoring through coupon generation, email and push notification dispatch, and database logging. A more hardened customer-facing delivery stack is scoped for a later production-hardening step once the underlying churn definition is analytically stable. The current repository state is better interpreted as an **internal operational validation baseline**: strong enough to demonstrate orchestration readiness and controlled activation logic, but still intentionally short of claiming a fully hardened real-send customer-facing system.
 
 ---
 
@@ -320,7 +324,7 @@ The project emphasizes downstream usefulness rather than a single headline metri
 
 ### Operational decisioning logic
 
-The current local candidate uses percentile-based operational tiers derived from the scored population:
+The canonical V2C artifact line uses percentile-based operational tiers derived from the scored population:
 
 - **HIGH**: top 20%
 - **MEDIUM**: next 30%
@@ -351,7 +355,7 @@ That baseline was useful because it proved the delivery chain worked from start 
 
 ### Phase 2 — Canonical V2C redesign + n8n operational validation ✅
 
-The current local candidate is a genuine redesign rather than a cosmetic continuation of v1. The main changes were:
+The canonical V2C artifact line is a genuine redesign rather than a cosmetic continuation of v1. The main changes were:
 
 - restricting the eligible population to customers with demonstrated recurrence potential,
 - moving to the canonical `V2C` formulation,
@@ -363,17 +367,18 @@ This redesign materially improved ranking quality while keeping the key methodol
 
 **Phase 2 also delivers a fully operational n8n orchestration layer (V9).** The final architecture uses two separate workflows connected through n8n's native Error Workflow mechanism: the main pipeline (`Daily Churn Retention Actions - V9`) handles the full business logic, while a dedicated `VivaMarket Error Handler` workflow manages failure alerting independently. This two-workflow pattern was adopted after resolving a known n8n issue where inline error nodes can be incorrectly auto-wired as main connections on the canvas. Both workflows were executed end-to-end in a real production environment (VPS + Docker + Postgres), validating the complete retention action pipeline: daily cron trigger, churn prediction retrieval from Postgres, SHAP explainability from the scoring API, risk routing, coupon generation, pre-send validation, email and push notification dispatch via OneSignal (credentials managed through n8n Variables), action logging with parameterized query bindings, and error alerting via the dedicated error handler. This closes Phase 2 as operationally complete, with n8n serving as the internal orchestration platform until the customer-facing delivery layer is implemented in Phase 3.
 
-### Phase 3 — Publication hardening
+### Phase 3 — Publication hardening + internal pilot framing
 
-Once the V2C analytical line was stabilized, the project entered a professionalization layer focused on publication readiness:
+Once the V2C analytical line was stabilized, the project entered a professionalization layer focused on publication readiness and clearer operational framing:
 
 - README restructuring around Spec-Driven development and human-supervised OpenClaw execution,
 - dependency cleanup and Docker support,
 - lightweight scoring tests,
 - asset normalization and branded report consistency,
-- a stronger dashboard layer, model card, and ROI simulation artifacts for stakeholder review.
+- a stronger dashboard layer, Model Card, and ROI simulation artifacts for stakeholder review,
+- explicit positioning of the current orchestration stack as an **internal pilot / controlled activation baseline** rather than a fully hardened customer-facing delivery layer.
 
-This means the repository now tells two stories at once: the historical v1 baseline that was already published, and the stronger local V2 candidate that shows how the project matured analytically and operationally.
+This means the repository now tells two stories at once: the historical v1 baseline that was already published, and the stronger canonical V2C artifact line that shows how the project matured analytically and operationally without pretending the business economics are already experimentally solved.
 
 ---
 
@@ -387,7 +392,7 @@ This means the repository now tells two stories at once: the historical v1 basel
 | Average Precision | ~0.994 | Inflated by class imbalance |
 | Interpretation | ⚠ | Operationally complete, analytically constrained |
 
-### Current local V2 candidate outcomes
+### Canonical V2C artifact line outcomes
 
 | Metric | Value |
 |:-------|:-----:|
@@ -410,11 +415,13 @@ The current synchronized local chain is complete through:
 - `NB07` deployment packaging
 - `NB08` retention orchestration
 - `NB09` reporting dashboard
-- n8n workflow V5 — executed end-to-end in production ✅
+- n8n workflow V9 — executed end-to-end in production ✅
+- publication-layer Model Card for governance-oriented project communication ✅
+- scenario-based ROI simulation for stakeholder discussion and internal pilot framing ✅
 
 ### Interpretation
 
-The candidate is technically complete and operationally much stronger than the original baseline in ranking quality. However, the core analytical caveat remains: the target is still highly positive-heavy, so calibration and threshold interpretation must remain cautious.
+The canonical V2C artifact line is technically complete and operationally much stronger than the original baseline in ranking quality. However, the core analytical caveat remains: the target is still highly positive-heavy, so calibration and threshold interpretation must remain cautious.
 
 ---
 
@@ -496,7 +503,7 @@ Project rule: each step is represented by **one canonical `.ipynb` file only**. 
 
 ### Processed data artifacts
 
-Examples from the current local candidate run:
+Examples from the canonical pipeline artifact run (`20260506`) that the downstream notebooks now treat as the shared run tag:
 
 - `data/processed/churn_features_20260506.parquet`
 - `data/processed/churn_predictions_20260506.parquet`
@@ -546,15 +553,17 @@ daily-customer-churn-predictor/
 │   ├── n8n_workflow_daily_churn_retention_workflow.json
 │   └── n8n_workflow_error_handler_workflow.json
 ├── reports/
+├── tests/
 ├── assets/
 │   └── images/
 │       ├── logo.gif
 │       ├── visual_identity_guide_v1.pdf
 │       └── n8n_workflow_phase2.png
-└── _private/
 ```
 
 Project rule: public notebook continuity is represented by canonical executed notebook files only. Temporary variants and draft artifacts are not part of the kept publication state.
+
+Operational traceability rule: `STATUS.md` is the working project log. After each material notebook, orchestration, or publication-layer update, refresh `Current state`, `Last completed step`, and `Next pending step` before reporting completion.
 
 ---
 
@@ -603,7 +612,7 @@ The architecture separates two complementary layers that are not mutually exclus
 - **Layer 2 — Internal orchestration (n8n, Phase 2):** manages the DS pipeline, reads scored predictions, generates coupons, dispatches notifications, and logs all actions. This layer is operational and remains valid in later project stages.
 - **Layer 3 — Customer-facing delivery (Phase 3):** extends Layer 2 with a more hardened customer-facing stack — production scheduling, channel integration governance, event tracking, and feedback loop — consuming the same retention payload as the contract between layers.
 
-The production-grade customer-facing automation — oriented to scalable channel delivery, operational governance, and closed-loop measurement — is scoped for **Phase 3**, once the underlying churn definition is analytically stable and the business population design decisions have been resolved.
+The production-grade customer-facing automation — oriented to scalable channel delivery, operational governance, and closed-loop measurement — is scoped for a **later hardening phase**, once the underlying churn definition is analytically stable and the business population design decisions have been resolved. In the current repository state, the stronger and more honest framing is: **internal pilot first, production delivery layer later**.
 
 ---
 
@@ -613,8 +622,9 @@ The production-grade customer-facing automation — oriented to scalable channel
 2. Calibration should be interpreted cautiously despite strong ranking metrics.
 3. Explainability is sampled rather than full-population SHAP.
 4. Operational thresholds are still strategy-oriented rather than fully ROI-optimized.
-5. The n8n workflow is the Phase 2 internal orchestration platform; production-oriented customer-facing automation (scheduling + channel delivery + feedback loop) is planned as a separate complementary layer in Phase 3, once the analytical base is stabilized.
-6. API persistence across container restarts requires a manual rclone remount step; automated startup handling is scoped for Phase 3.
+5. The n8n workflow is the current internal orchestration platform; it is strong enough for internal pilot / controlled validation framing, but it should not yet be presented as the final customer-facing delivery layer.
+6. The current ROI layer is scenario-based and useful for stakeholder discussion, but it is not causal or experimentally validated.
+7. API persistence across container restarts requires a manual rclone remount step; automated startup handling is scoped for a later hardening phase.
 
 ---
 
@@ -637,6 +647,7 @@ The production-grade customer-facing automation — oriented to scalable channel
 10. **Feature-importance stability checks across time**
 11. **More hardened orchestration failure handling**
 12. **Automated API startup on container restart**
+13. **Controlled internal real-send test system before broader customer-facing activation**
 
 ### Strategic sequencing recommendation
 
@@ -662,17 +673,18 @@ The production-grade customer-facing automation — oriented to scalable channel
 
 1. Build the React business-facing UI
 2. Add drift monitoring and monitoring cadence
-3. Implement the customer-facing delivery layer (Layer 3): a hardened stack combining production scheduling, channel execution governance (e.g. Braze or equivalent), event tracking, and feedback loop — consuming the retention payload produced by the existing n8n Layer 2 pipeline
-4. Automate daily scoring pipeline so `churn_predictions` is populated without manual parquet loading
-5. Implement automated API startup on container restart (remove manual rclone dependency)
-6. Extend model governance and artifact registry
-7. Containerize broader serving / interface stack if needed
+3. Strengthen the current orchestration layer into a controlled internal real-send test system with clearer safeguards, send governance, and measurement hooks
+4. Implement the customer-facing delivery layer (Layer 3): a hardened stack combining production scheduling, channel execution governance (e.g. Braze or equivalent), event tracking, and feedback loop — consuming the retention payload produced by the existing n8n Layer 2 pipeline
+5. Automate daily scoring pipeline so `churn_predictions` is populated without manual parquet loading
+6. Implement automated API startup on container restart (remove manual rclone dependency)
+7. Extend model governance and artifact registry
+8. Containerize broader serving / interface stack if needed
 
 ---
 
 ## Version Note
 
-This README documents the **current synchronized local v2 candidate with Phase 2 complete** state. The earlier GitHub publication corresponded to the **v1.0.0 baseline**. Any next public release should preserve explicit comparability between the published v1 baseline and this canonical `V2C` redesign, and document the Phase 2 n8n V9 operational validation (two-workflow architecture) as a completed milestone.
+This README documents the **current synchronized canonical V2C artifact line with Phase 2 complete and the minimum viable Phase 3 publication layer in place**. The earlier GitHub publication corresponded to the **v1.0.0 baseline**. Any next public release should preserve explicit comparability between the published v1 baseline and this canonical `V2C` redesign, document the Phase 2 n8n V9 operational validation (two-workflow architecture) as a completed milestone, and present the current orchestration / ROI layer with the intended **internal-pilot-first** framing.
 
 ---
 
@@ -691,10 +703,10 @@ If you reuse ideas or workflow patterns from this repository, attribution is app
 
 ---
 
-**Last Updated:** May 18, 2026  
-**Pipeline version:** v20260518 · n8n V9  
-**Status:** NB01–NB09 Complete · Phase 2 Complete · n8n V9 Executed (two-workflow architecture) · v1.0.0 Baseline Published · Canonical V2C Candidate Synchronized
+**Last Updated:** May 21, 2026  
+**Canonical artifact line:** 20260506 · n8n V9  
+**Status:** NB01–NB09 Complete · Phase 2 Complete · n8n V9 Executed (two-workflow architecture) · Phase 3 MVP Publication Layer Synchronized · v1.0.0 Baseline Published · Canonical V2C Artifact Line Active
 
 ---
 
-*This README serves both as technical documentation and as a publication-oriented narrative of the project's analytical evolution from the published v1 baseline through the current synchronized V2C candidate with Phase 2 operational validation.*
+*This README serves both as technical documentation and as a publication-oriented narrative of the project's analytical evolution from the published v1 baseline through the synchronized canonical V2C artifact line, Phase 2 operational validation, and the current internal-pilot-first publication framing.*

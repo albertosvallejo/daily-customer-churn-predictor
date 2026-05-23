@@ -8,10 +8,8 @@ venv/
 .ipynb_checkpoints/
 
 # Data artifacts
-/data/processed/
 /data/interim/
 /models/
-/reports/
 
 # Raw data — source database never versioned
 data/raw/*.sqlite

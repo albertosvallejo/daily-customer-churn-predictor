@@ -1,0 +1,2 @@
+{"customer_id": "cust_live_check", "risk_level": "HIGH", "discount_pct": 25, "coupon_code": "VIVA-R7K4-T2S7", "created_at": "2026-05-18T08:08:50Z"}
+{"customer_id": "test-001", "risk_level": "HIGH", "discount_pct": 20, "coupon_code": "VIVA-FHY8-EQFJ", "created_at": "2026-05-18T09:56:15Z"}
