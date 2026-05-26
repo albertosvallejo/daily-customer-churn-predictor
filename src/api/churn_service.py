@@ -1,26 +1,30 @@
 import json
 import logging
+import os
 import secrets
 import threading
 from datetime import datetime, timezone
+from functools import lru_cache
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, urlparse
 
+import joblib
 import pandas as pd
 
 logger = logging.getLogger(__name__)
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(os.getenv("PROJECT_ROOT", Path(__file__).resolve().parents[2]))
 DATA_PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
+MODELS_DIR = PROJECT_ROOT / "models"
 COUPON_REGISTRY_PATH = DATA_PROCESSED_DIR / "generated_coupons.jsonl"
 COUPON_LOCK = threading.Lock()
 COUPON_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 VALID_RISK_LEVELS = {"HIGH", "MEDIUM", "LOW"}
-DEFAULT_HOST = "0.0.0.0"
-DEFAULT_PORT = 62880
+DEFAULT_HOST = os.getenv("CHURN_API_HOST", "0.0.0.0")
+DEFAULT_PORT = int(os.getenv("CHURN_API_PORT", "62880"))
 
 
 def _utc_now_iso() -> str:
@@ -67,6 +71,33 @@ def _latest_explainability_path() -> Path:
     if not matches:
         raise FileNotFoundError("No explainability parquet file found")
     return matches[-1]
+
+
+@lru_cache(maxsize=1)
+def _latest_scoring_metadata() -> dict:
+    bundle_paths = sorted(MODELS_DIR.glob("churn_scoring_package_*.joblib"), reverse=True)
+    if not bundle_paths:
+        explainability_path = _latest_explainability_path()
+        fallback_tag = explainability_path.stem.split("_")[-1]
+        return {
+            "run_id": f"canonical_v2c_{fallback_tag}",
+            "run_date_tag": fallback_tag,
+            "model_version": "unknown",
+            "pipeline_tag": "unknown",
+            "source_file": explainability_path.name,
+        }
+
+    bundle_path = bundle_paths[0]
+    bundle = joblib.load(bundle_path)
+    metadata = bundle.get("metadata", {}) if isinstance(bundle, dict) else {}
+    run_date_tag = metadata.get("run_date_tag", bundle_path.stem.split("_")[-1])
+    return {
+        "run_id": metadata.get("run_id", f"canonical_v2c_{run_date_tag}"),
+        "run_date_tag": run_date_tag,
+        "model_version": metadata.get("model_version", metadata.get("version_name", "unknown")),
+        "pipeline_tag": metadata.get("pipeline_tag", "unknown"),
+        "source_file": bundle_path.name,
+    }
 
 
 def _load_latest_explainability(customer_id: str | None = None, risk_level: str | None = None, limit: int | None = None) -> dict:
@@ -135,14 +166,15 @@ def _generate_coupon_code(existing_codes: set[str]) -> str:
 
 
 def _generate_coupon(payload: dict) -> dict:
-    customer_id = str(payload.get("customer_id", "")).strip()
-    risk_level = str(payload.get("risk_level", "")).strip().upper()
+    customer_unique_id = str(payload.get("customer_unique_id") or payload.get("customer_id") or "").strip()
+    risk_tier = str(payload.get("risk_tier") or payload.get("risk_level") or "").strip().upper()
     discount_pct = payload.get("discount_pct")
+    scoring_metadata = _latest_scoring_metadata()
 
-    if not customer_id:
-        raise ValueError("customer_id is required")
-    if risk_level not in VALID_RISK_LEVELS:
-        raise ValueError("risk_level must be one of HIGH, MEDIUM, LOW")
+    if not customer_unique_id:
+        raise ValueError("customer_unique_id is required")
+    if risk_tier not in VALID_RISK_LEVELS:
+        raise ValueError("risk_tier must be one of HIGH, MEDIUM, LOW")
     if discount_pct is None:
         raise ValueError("discount_pct is required")
 
@@ -160,11 +192,14 @@ def _generate_coupon(payload: dict) -> dict:
         coupon_code = _generate_coupon_code(existing_codes)
         created_at = _utc_now_iso()
         coupon_payload = {
-            "customer_id": customer_id,
-            "risk_level": risk_level,
+            "customer_unique_id": customer_unique_id,
+            "risk_tier": risk_tier,
             "discount_pct": int(discount_value) if discount_value.is_integer() else round(discount_value, 2),
             "coupon_code": coupon_code,
             "created_at": created_at,
+            "run_id": scoring_metadata["run_id"],
+            "run_date_tag": scoring_metadata["run_date_tag"],
+            "model_version": scoring_metadata["model_version"],
         }
         with COUPON_REGISTRY_PATH.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(coupon_payload, ensure_ascii=False) + "\n")
@@ -177,7 +212,21 @@ class ChurnServiceHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         if parsed.path == "/health":
-            _json_response(self, HTTPStatus.OK, {"status": "ok", "service": "daily-customer-churn-api", "timestamp": _utc_now_iso()})
+            scoring_metadata = _latest_scoring_metadata()
+            _json_response(
+                self,
+                HTTPStatus.OK,
+                {
+                    "status": "ok",
+                    "service": "daily-customer-churn-api",
+                    "timestamp": _utc_now_iso(),
+                    "run_id": scoring_metadata["run_id"],
+                    "run_date_tag": scoring_metadata["run_date_tag"],
+                    "model_version": scoring_metadata["model_version"],
+                    "pipeline_tag": scoring_metadata["pipeline_tag"],
+                    "source_file": scoring_metadata["source_file"],
+                },
+            )
             return
 
         if parsed.path == "/explainability/latest":

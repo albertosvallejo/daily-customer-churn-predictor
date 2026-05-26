@@ -1,0 +1,59 @@
+{
+  "name": "VivaMarket Conversion Detection",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 5 * * *"
+            }
+          ]
+        }
+      },
+      "id": "1dbfdbdd-bf7b-4511-a2c6-80d4dfd88ee1",
+      "name": "Cron Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        320,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "command": "python3 src/pipeline/detect_conversions.py"
+      },
+      "id": "401f99f4-b275-4b2a-9277-8b54e6c62c4d",
+      "name": "Detect Conversions",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        560,
+        300
+      ],
+      "onError": "stopWorkflow"
+    }
+  ],
+  "connections": {
+    "Cron Trigger": {
+      "main": [
+        [
+          {
+            "node": "Detect Conversions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "5W6h4T8ck3na51md"
+  },
+  "pinData": {},
+  "tags": []
+}
