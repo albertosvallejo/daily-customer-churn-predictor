@@ -1,5 +1,6 @@
 # Python
 __pycache__/
+**/__pycache__/
 *.py[cod]
 *.so
 .venv/
@@ -12,6 +13,7 @@ venv/
 /models/
 
 # Raw data — source database never versioned
+# Public source: https://www.kaggle.com/datasets/terencicp/e-commerce-dataset-by-olist-as-an-sqlite-database
 data/raw/*.sqlite
 
 # Internal / operational files
@@ -25,6 +27,9 @@ notebooks/*.executed.ipynb
 notebooks/*.audit_run.ipynb
 notebooks/borrador notebook 01.txt
 
+# Historical report archive kept locally / privately only
+reports/archive/
+
 # OS / editors
 .DS_Store
 Thumbs.db
@@ -32,12 +37,11 @@ desktop.ini
 .vscode/
 .idea/
 
-# Logs
+# Logs / runtime artifacts
+logs/
 *.log
+*.pid
 
 # Local runtime
 *.sqlite-shm
 *.sqlite-wal
-# Internal history / release tracking
-STATUS.md
-RELEASE_NOTES.md

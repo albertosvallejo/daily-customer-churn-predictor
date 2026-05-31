@@ -1,0 +1,173 @@
+{
+  "run_date": "2026-05-31",
+  "measurement_label": "[DEMO — simulated campaign data]",
+  "scope_note": "Governance pass built on the synthetic Block C closure baseline for portfolio/demo scope.",
+  "feature_drift": [
+    {
+      "feature": "recency_days",
+      "baseline_mean": 186.77346084877465,
+      "current_mean": 186.6698312236287,
+      "ks_stat": 0.004562830022286635,
+      "triggered": false
+    },
+    {
+      "feature": "total_orders",
+      "baseline_mean": 2.123729826658697,
+      "current_mean": 2.1336146272855134,
+      "ks_stat": 0.005382920429792937,
+      "triggered": false
+    },
+    {
+      "feature": "total_payment_value",
+      "baseline_mean": 310.0992618051405,
+      "current_mean": 316.27622011251754,
+      "ks_stat": 0.006795275001408196,
+      "triggered": false
+    },
+    {
+      "feature": "orders_30d",
+      "baseline_mean": 0.06365809922295278,
+      "current_mean": 0.06329113924050633,
+      "ks_stat": 0.0003846144145915886,
+      "triggered": false
+    },
+    {
+      "feature": "orders_90d",
+      "baseline_mean": 0.2214584578601315,
+      "current_mean": 0.2190576652601969,
+      "ks_stat": 0.003192509812921851,
+      "triggered": false
+    }
+  ],
+  "score_drift": {
+    "baseline_mean": 0.8702667866334167,
+    "current_mean": 0.8701989050265585,
+    "mean_shift": -6.78816068582222e-05,
+    "baseline_top_decile_density": 0.10011954572624028,
+    "current_top_decile_density": 0.09739803094233473,
+    "triggered": false
+  },
+  "tier_stability": [
+    {
+      "risk_tier": "HIGH",
+      "baseline_share": 0.20023909145248056,
+      "current_share": 0.1979606188466948,
+      "share_delta": -0.0022784726057857585
+    },
+    {
+      "risk_tier": "LOW",
+      "baseline_share": 0.5,
+      "current_share": 0.5038677918424754,
+      "share_delta": 0.003867791842475432
+    },
+    {
+      "risk_tier": "MEDIUM",
+      "baseline_share": 0.2997609085475194,
+      "current_share": 0.2981715893108298,
+      "share_delta": -0.0015893192366895903
+    }
+  ],
+  "trigger_thresholds": {
+    "feature_ks": 0.15,
+    "score_mean_shift": 0.05,
+    "high_tier_share": 0.3,
+    "holdout_lift_below_zero": 0.0
+  },
+  "trigger_summary": [
+    "No retraining trigger breached on the current synthetic governance pass."
+  ],
+  "kpi_payload": {
+    "as_of": "2026-05-30T00:00:00Z",
+    "summary": [
+      {
+        "risk_tier": "HIGH",
+        "window_days": 14,
+        "holdout": false,
+        "closed_evaluations": 28128,
+        "conversions": 4969,
+        "conversion_rate": 0.17665671217292378
+      },
+      {
+        "risk_tier": "HIGH",
+        "window_days": 14,
+        "holdout": true,
+        "closed_evaluations": 4992,
+        "conversions": 481,
+        "conversion_rate": 0.09635416666666667
+      },
+      {
+        "risk_tier": "LOW",
+        "window_days": 30,
+        "holdout": false,
+        "closed_evaluations": 31840,
+        "conversions": 1820,
+        "conversion_rate": 0.0571608040201005
+      },
+      {
+        "risk_tier": "LOW",
+        "window_days": 30,
+        "holdout": true,
+        "closed_evaluations": 5792,
+        "conversions": 239,
+        "conversion_rate": 0.041263812154696135
+      },
+      {
+        "risk_tier": "MEDIUM",
+        "window_days": 21,
+        "holdout": false,
+        "closed_evaluations": 51373,
+        "conversions": 5612,
+        "conversion_rate": 0.1092402623946431
+      },
+      {
+        "risk_tier": "MEDIUM",
+        "window_days": 21,
+        "holdout": true,
+        "closed_evaluations": 9307,
+        "conversions": 548,
+        "conversion_rate": 0.05888041259267218
+      }
+    ],
+    "holdout_lift": [
+      {
+        "risk_tier": "HIGH",
+        "attr_window_days": 14,
+        "treated_conversion_rate": 0.17665671217292378,
+        "holdout_conversion_rate": 0.09635416666666667,
+        "holdout_lift": 0.08030254550625711
+      },
+      {
+        "risk_tier": "LOW",
+        "attr_window_days": 30,
+        "treated_conversion_rate": 0.0571608040201005,
+        "holdout_conversion_rate": 0.041263812154696135,
+        "holdout_lift": 0.015896991865404365
+      },
+      {
+        "risk_tier": "MEDIUM",
+        "attr_window_days": 21,
+        "treated_conversion_rate": 0.1092402623946431,
+        "holdout_conversion_rate": 0.05888041259267218,
+        "holdout_lift": 0.05035984980197092
+      }
+    ],
+    "totals": {
+      "actions": 200760,
+      "closed_evaluations": 131432,
+      "treated_closed_evaluations": 111341,
+      "holdout_closed_evaluations": 20091
+    },
+    "label": "[pre-holdout — attribution unconfirmed]"
+  },
+  "model_snapshot": {
+    "roc_auc": 0.8015756039616547,
+    "average_precision": 0.9936779134928504,
+    "precision_at_top_10pct": 0.9970149253731344
+  },
+  "totals": {
+    "baseline_rows": 3346,
+    "current_rows": 2844,
+    "closed_evaluations": 131432,
+    "current_high_share": 0.1979606188466948
+  }
+}

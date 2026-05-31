@@ -1,0 +1,181 @@
+{
+  "run_date": "2026-05-31",
+  "measurement_label": "[DEMO — simulated campaign data]",
+  "decision": "support_population_redesign_candidate",
+  "decision_rationale": [
+    "The benchmark uses the user-approved historical synthetic campaign baseline.",
+    "This is a portfolio/demo redesign benchmark, not a production-observed retraining decision.",
+    "Retainable customers show stronger average holdout lift than the structurally single-purchase segment, supporting the redesign hypothesis."
+  ],
+  "thresholds": {
+    "min_closed_evals": 20,
+    "min_positive_lift": 0.01,
+    "min_segment_share": 0.2
+  },
+  "overall_baseline": {
+    "treated_conversion_rate": 0.11189234714638555,
+    "customers": 3346,
+    "closed_evaluations": 124740
+  },
+  "segment_summary": [
+    {
+      "segment": "retainable",
+      "customers": 1163,
+      "avg_closed_evaluations": 41.413585554600175,
+      "avg_conversion_rate": 0.17067621027769073,
+      "avg_treated_conversion_rate": 0.1736333016668106,
+      "avg_holdout_conversion_rate": 0.14556277056277056,
+      "avg_holdout_lift": 0.028070531104040036,
+      "avg_score": 0.6604748813413586
+    },
+    {
+      "segment": "structural_single_purchase",
+      "customers": 2183,
+      "avg_closed_evaluations": 35.07833256985799,
+      "avg_conversion_rate": 0.05952727853980617,
+      "avg_treated_conversion_rate": 0.06371615816163216,
+      "avg_holdout_conversion_rate": 0.05430048202566932,
+      "avg_holdout_lift": 0.009415676135962843,
+      "avg_score": 0.4506138822721026
+    }
+  ],
+  "tier_mix": [
+    {
+      "segment": "retainable",
+      "dominant_tier": "HIGH",
+      "customers": 527
+    },
+    {
+      "segment": "retainable",
+      "dominant_tier": "LOW",
+      "customers": 98
+    },
+    {
+      "segment": "retainable",
+      "dominant_tier": "MEDIUM",
+      "customers": 538
+    },
+    {
+      "segment": "structural_single_purchase",
+      "dominant_tier": "HIGH",
+      "customers": 163
+    },
+    {
+      "segment": "structural_single_purchase",
+      "dominant_tier": "LOW",
+      "customers": 1078
+    },
+    {
+      "segment": "structural_single_purchase",
+      "dominant_tier": "MEDIUM",
+      "customers": 942
+    }
+  ],
+  "candidate_customer_summary": {
+    "retainable_share": 0.3475791990436342,
+    "retainable_customers": 1163,
+    "structural_customers": 2183
+  },
+  "top_retainable_examples": [
+    {
+      "customer_unique_id": "CUST_02220",
+      "dominant_tier": "HIGH",
+      "closed_evaluations": 46,
+      "conversion_rate": 0.34782608695652173,
+      "treated_conversion_rate": 0.34782608695652173,
+      "holdout_conversion_rate": null,
+      "holdout_lift": null,
+      "avg_score": 0.791837
+    },
+    {
+      "customer_unique_id": "CUST_02307",
+      "dominant_tier": "HIGH",
+      "closed_evaluations": 46,
+      "conversion_rate": 0.34782608695652173,
+      "treated_conversion_rate": 0.34782608695652173,
+      "holdout_conversion_rate": null,
+      "holdout_lift": null,
+      "avg_score": 0.987303
+    },
+    {
+      "customer_unique_id": "CUST_03010",
+      "dominant_tier": "HIGH",
+      "closed_evaluations": 46,
+      "conversion_rate": 0.34782608695652173,
+      "treated_conversion_rate": 0.34782608695652173,
+      "holdout_conversion_rate": null,
+      "holdout_lift": null,
+      "avg_score": 0.721518
+    },
+    {
+      "customer_unique_id": "CUST_00966",
+      "dominant_tier": "MEDIUM",
+      "closed_evaluations": 39,
+      "conversion_rate": 0.3333333333333333,
+      "treated_conversion_rate": 0.3333333333333333,
+      "holdout_conversion_rate": null,
+      "holdout_lift": null,
+      "avg_score": 0.469913
+    },
+    {
+      "customer_unique_id": "CUST_00006",
+      "dominant_tier": "HIGH",
+      "closed_evaluations": 46,
+      "conversion_rate": 0.32608695652173914,
+      "treated_conversion_rate": 0.32608695652173914,
+      "holdout_conversion_rate": null,
+      "holdout_lift": null,
+      "avg_score": 0.896243
+    },
+    {
+      "customer_unique_id": "CUST_00704",
+      "dominant_tier": "HIGH",
+      "closed_evaluations": 46,
+      "conversion_rate": 0.32608695652173914,
+      "treated_conversion_rate": 0.32608695652173914,
+      "holdout_conversion_rate": null,
+      "holdout_lift": null,
+      "avg_score": 0.720709
+    },
+    {
+      "customer_unique_id": "CUST_01967",
+      "dominant_tier": "HIGH",
+      "closed_evaluations": 46,
+      "conversion_rate": 0.32608695652173914,
+      "treated_conversion_rate": 0.32608695652173914,
+      "holdout_conversion_rate": null,
+      "holdout_lift": null,
+      "avg_score": 0.854261
+    },
+    {
+      "customer_unique_id": "CUST_03329",
+      "dominant_tier": "HIGH",
+      "closed_evaluations": 46,
+      "conversion_rate": 0.32608695652173914,
+      "treated_conversion_rate": 0.32608695652173914,
+      "holdout_conversion_rate": null,
+      "holdout_lift": null,
+      "avg_score": 0.808199
+    },
+    {
+      "customer_unique_id": "CUST_00300",
+      "dominant_tier": "HIGH",
+      "closed_evaluations": 46,
+      "conversion_rate": 0.30434782608695654,
+      "treated_conversion_rate": 0.30434782608695654,
+      "holdout_conversion_rate": null,
+      "holdout_lift": null,
+      "avg_score": 0.956101
+    },
+    {
+      "customer_unique_id": "CUST_00651",
+      "dominant_tier": "HIGH",
+      "closed_evaluations": 46,
+      "conversion_rate": 0.30434782608695654,
+      "treated_conversion_rate": 0.30434782608695654,
+      "holdout_conversion_rate": null,
+      "holdout_lift": null,
+      "avg_score": 0.753465
+    }
+  ]
+}

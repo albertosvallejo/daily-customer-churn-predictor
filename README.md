@@ -7,37 +7,58 @@
 [![Scikit--learn](https://img.shields.io/badge/scikit--learn-Validation-F7931E.svg)](https://scikit-learn.org/)
 [![Jupyter](https://img.shields.io/badge/Jupyter-Notebook%20Pipeline-F37626.svg)](https://jupyter.org/)
 [![License](https://img.shields.io/badge/License-Personal%20Portfolio-blue.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-v1.0.0%20Baseline%20%7C%20v2%20+%20Phase%202%20Complete-orange.svg)](#version-note)
 [![Workflow](https://img.shields.io/badge/Workflow-Spec--Driven%20%2B%20Human%20Supervision-005090.svg)](#development-methodology)
 
 ---
 
 ## Executive Summary
 
-> ⚠️ **BEFORE YOU START — ANALYTICAL BASELINE NOTE**: This repository contains both the historical **v1.0.0 published baseline** and the current synchronized **canonical V2C artifact line**. The original v1 baseline should not be interpreted as a final analytical definition of churn for VivaMarket Brasil: the 90-day forward target was structurally too positive-heavy, which kept average precision near **0.994** while limiting business separability (ROC AUC ~**0.589** on the v1 test split). The canonical V2C artifact line materially improves ranking quality (**ROC AUC ~0.8016**) through a redesigned `V2C` formulation, but the target remains positive-heavy and should still be interpreted cautiously. This is not a model failure — it is a consequence of marketplace dynamics, one-time-buyer dominance, and the difficulty of defining a truly retainable customer population. The limitation is explicit and should be handled as a genuine business-first analytical design problem.
+> **READ THIS FIRST — WHAT THIS REPOSITORY IS NOW:** this repository documents the current **canonical V2C analytical line** and the **Phase 4 portfolio/demo baseline**. The project is technically real in its notebooks, scoring logic, API, orchestration, reporting, and governance artifacts, but the campaign-response measurement used in Phase 4 is still based on a **simulated campaign baseline**, not live customer telemetry.
 
-This is a **personal deep-dive project** built after completing a Master's in Data Science to gain hands-on experience with production-oriented churn modeling in a realistic marketplace setting. It implements a **complete end-to-end churn workflow** for VivaMarket Brasil, covering the full path from raw SQLite extraction to scored retention queues, explainability outputs, automation-ready payloads, and business-facing HTML reporting.
+This is a **personal deep-dive project** built after completing a Master's in Data Science to gain hands-on experience with production-oriented churn modeling in a realistic marketplace setting. It implements a **complete end-to-end churn workflow** for VivaMarket Brasil, covering the full path from raw SQLite extraction to scored retention queues, explainability outputs, automation-ready payloads, governance surfaces, and business-facing HTML reporting.
 
-The repository is intentionally framed as more than a model notebook chain: it now also documents the transition from pure analytical redesign into an **internal pilot / controlled operational activation baseline**, while keeping a clear boundary between that internal layer and any future fully hardened real-send customer-facing stack.
+The repository is intentionally framed as more than a model notebook chain: it documents the full progression from analytical redesign into an **internal pilot / controlled operational activation baseline**, and then into a **Phase 4 portfolio measurement and governance layer**. The scope boundary is explicit: this is strong portfolio/demo evidence, not a claim of live production-observed campaign performance.
 
-The goal was to go beyond a typical academic churn notebook and build a pipeline that addresses the real challenges of marketplace churn: irregular purchase behavior, analytically complex target definition, temporal consistency requirements, and the need to translate model scores into operational business decisions.
+The goal was to go beyond a typical academic churn notebook and build a pipeline that addresses the real challenges of marketplace churn: irregular purchase behavior, analytically complex target definition, temporal consistency requirements, calibration tradeoffs, governance needs, and the translation of model scores into operational business decisions.
 
 **Development approach:** This project was built using **The Architect (v1)**, a personal **Spec-Driven Data Science agent/workflow** developed alongside the project. Every notebook was analytically specified before being built, executed with OpenClaw agent support, and reviewed under explicit human supervision before the next step was started. The workflow prioritizes traceability, notebook-by-notebook QA, and clean versioned evolution over execution speed.
 
-**Canonical V2C artifact line — key metrics:**
+### Project state at a glance
 
-| Metric | Value | Context |
-|:-------|:-----:|:--------|
+| Dimension | Current state | Why it matters |
+|:----------|:--------------|:---------------|
+| Analytical line | Canonical `V2C` | Current scoring and decision baseline documented in the repo |
+| Operational baseline | Phase 2 / Phase 3B complete | API + n8n + reporting chain already implemented and validated |
+| Current portfolio baseline | `v4.0.0-phase4-demo` | Adds measurement, governance, benchmark reasoning, and publication hardening |
+| Measurement scope | Simulated campaign baseline | Honest boundary: no false claim of live observed campaign lift |
+
+### Canonical V2C artifact line — key metrics and decisions
+
+| Metric / decision | Value | Context |
+|:------------------|:-----:|:--------|
 | ROC AUC (test split) | ~0.8016 | Canonical `V2C` artifact line |
-| Average Precision | ~0.9937 | Still influenced by positive-heavy target |
+| Average Precision | ~0.9937 | Still influenced by the positive-heavy target |
 | Precision@Top 5% | 1.0000 | Held-out scored set |
 | Precision@Top 10% | ~0.9970 | Held-out scored set |
+| Calibration winner (smallest mean gap) | **Isotonic** | Mean calibration gap `0.0082` |
+| Best ranking-preserving calibration variant | **Sigmoid** | Reliability improves while ROC AUC stays ~`0.8016` |
+| Practical calibration conclusion | **Ranking-first baseline** | Better-calibrated probability variants exist, but the baseline should not be oversold as a probability-led production policy |
 | SHAP explainability | ✅ robust scored sample | NB06 |
 | Deployment prep | ✅ scoring package + smoke test | NB07 |
-| Orchestration | ✅ n8n workflow V9 — two-workflow architecture (main + error handler), executed end-to-end in production (Phase 2 internal orchestration, validated 2026-05-18) | NB08 |
+| Orchestration | ✅ n8n workflow V9 — two-workflow architecture (main + error handler), executed end-to-end in production | NB08 |
 | Reporting | ✅ branded HTML dashboard | NB09 |
-| Model governance | ✅ Model Card (latest local publication layer) | Phase 3 |
-| ROI framing | ✅ scenario-based ROI layer for stakeholder discussion | Phase 3 |
+| Phase 4 measurement baseline | ✅ synthetic 30-day `retention_events` + closed-evaluation KPI layer | Blocks C–D |
+| Model governance | ✅ drift monitor + Phase 4 demo Model Card v3-equivalent surface | Block D |
+| Population redesign benchmark | ✅ retainable-vs-structural benchmark documented | Block F |
+
+### Why the calibration result matters
+
+The project now contains explicit evidence that:
+- **raw probabilities** preserve ranking but are poorly calibrated;
+- **sigmoid** materially improves reliability without losing ranking quality;
+- **isotonic** achieves the smallest mean calibration gap, but with a mild ranking tradeoff.
+
+The correct public interpretation is therefore precise: the project has **credible calibrated variants**, but the current baseline should still be communicated as a **ranking-first system** rather than as a literally calibrated production risk engine.
 
 **Top churn driver families (canonical V2C artifact line):**
 
@@ -54,7 +75,29 @@ The goal was to go beyond a typical academic churn notebook and build a pipeline
 
 ## Quick Start
 
-> **Current status:** NB01–NB09 complete with canonical executed notebooks. Phase 2 is complete and the n8n workflow (V9, two-workflow architecture) has been executed end-to-end in a real production environment. The synchronized Phase 3B baseline is now also operationally closed for the current internal-pilot scope: the repository includes Docker support, updated env-driven runtime configuration, passing scoring/API tests, refreshed workflow documentation, verified Drive backup, and the hardened n8n routing logic with explicit LOW-tier skip logging (`low_tier_dispatch_deferred_td12`). The current publication layer also includes a stronger Model Card and a scenario-based ROI layer aligned with an **internal-pilot-first / production-layer-later** roadmap.
+> **Current status:** NB01–NB09 are complete on the canonical line. Phase 2 orchestration is implemented and validated, Phase 3B publication hardening is closed for the internal-pilot scope, and the current portfolio baseline is **`v4.0.0-phase4-demo`**: simulated measurement, KPI monitoring, governance/drift reporting, calibration evidence, stakeholder BI reporting, and a benchmarked population-redesign decision layer are all already documented.
+
+> **How to read this repo:** the code and analytical workflow are real; the Phase 4 campaign-response measurement layer is still portfolio/demo-scoped because it relies on a simulated campaign baseline rather than live customer telemetry.
+
+> **Main takeaway:** this repository is no longer only about building a churn model. It now shows how the system is scored, interpreted, orchestrated, measured, governed, and challenged analytically after deployment.
+
+> **Calibration outcome:** isotonic wins on mean calibration gap, sigmoid preserves ranking best, and the correct portfolio conclusion remains **ranking-first baseline** rather than probability-led production policy.
+
+> **Best next reader path:** Executive Summary → Results & Performance → Phase 4 closure summary → Version Note.
+
+> **Main evidence artifacts to open first:** `reports/model_diagnostics_20260519.html`, `reports/phase4_governance_monitor_latest.html`, `reports/phase4_population_redesign_benchmark_20260531.html`, and `reports/phase4_bi_dashboard_demo.html`.
+
+> **Public data note:** the raw SQLite source is public and downloadable from Kaggle, but excluded from versioned scope because of size.
+
+> **Scope honesty:** the current portfolio baseline demonstrates strong technical execution and analytical maturity, but it does not claim live observed campaign lift or experimentally validated ROI.
+
+> **Comparability rule:** any version-to-version comparison belongs in **Project Evolution**, not in the executive framing of current project performance.
+
+> **Release framing:** if published now, this repository should be positioned as the current **Phase 4 portfolio/demo baseline**, not as a live production case study.
+
+> **Why this matters:** the most senior part of the project is not just the model metrics — it is the explicit decision logic around calibration, governance, measurement scope, and redesign evidence.
+
+> **Bottom line:** this is a stronger portfolio piece precisely because it is technically ambitious and explicit about its evidence boundaries.
 
 ### Running the notebook pipeline
 
@@ -86,6 +129,8 @@ docker run --rm -p 8888:8888 churn-vivamarket
 - Jupyter / Google Colab / local JupyterLab
 - 8GB+ RAM for feature engineering and explainability sampling
 - Source SQLite database placed in `data/raw/`
+
+**Raw data note:** the original SQLite source used in this project is public and can be downloaded from Kaggle: <https://www.kaggle.com/datasets/terencicp/e-commerce-dataset-by-olist-as-an-sqlite-database>. It is intentionally kept out of versioned project scope because of size (>100MB), even though the dataset itself is public.
 
 **Prerequisites:**
 - All notebooks must be executed in sequence — each notebook's outputs feed directly into the next
@@ -385,14 +430,6 @@ This means the repository now tells two stories at once: the historical v1 basel
 
 ## Results & Performance
 
-### v1 historical baseline
-
-| Metric | Value | Context |
-|:-------|:-----:|:--------|
-| ROC AUC | ~0.589 | Positive-heavy 90-day baseline |
-| Average Precision | ~0.994 | Inflated by class imbalance |
-| Interpretation | ⚠ | Operationally complete, analytically constrained |
-
 ### Canonical V2C artifact line outcomes
 
 | Metric | Value |
@@ -411,7 +448,7 @@ This means the repository now tells two stories at once: the historical v1 basel
 
 The current synchronized local chain is complete through:
 
-- `NB05` diagnostics
+- `NB05` diagnostics + explicit calibration decision layer
 - `NB06` explainability
 - `NB07` deployment packaging
 - `NB08` retention orchestration
@@ -419,10 +456,46 @@ The current synchronized local chain is complete through:
 - n8n workflow V9 — executed end-to-end in production ✅
 - publication-layer Model Card for governance-oriented project communication ✅
 - scenario-based ROI simulation for stakeholder discussion and internal pilot framing ✅
+- Phase 4 KPI monitor over the synthetic historical campaign baseline ✅
+- Phase 4 BI dashboard demo with professional simulated-baseline labeling ✅
+- Phase 4 governance/drift monitor + demo Model Card v3-equivalent surface ✅
+- Phase 4 population-redesign benchmark + explicit decision artifact ✅
+
+### Phase 4 closure summary
+
+#### What was implemented
+- OneSignal event-ingestion API baseline (`POST /events/onesignal` and `GET /health/events`)
+- tier-specific conversion-attribution logic (`HIGH=14`, `MEDIUM=21`, `LOW=30`)
+- synthetic `retention_events` / closed-evaluation KPI layer
+- stakeholder-facing KPI monitor and BI dashboard demo
+- governance/drift monitor with feature, score, and tier layers plus trigger rules
+- Phase 4 demo Model Card upgrade
+- retainable-vs-structural-single-purchase benchmark for the population-redesign hypothesis
+
+#### What was measured
+- closed conversion evaluations across treated and holdout cohorts
+- tier-level conversion rates and holdout lift on the user-provided historical synthetic baseline
+- feature-drift, score-drift, and tier-stability indicators
+- segment-level benchmark outcomes for `retainable` vs `structural_single_purchase`
+
+#### What decisions were taken and with what evidence
+- **Phase 4 demo measurement baseline accepted:** supported by `retention_actions_synthetic_30d.parquet`, `retention_events_synthetic_30d.parquet`, and the KPI monitor outputs
+- **Block D governance baseline accepted:** supported by `reports/phase4_governance_monitor_latest.html`, `data/processed/phase4_governance_monitor_latest.json`, and `reports/model_card_v3_phase4_demo_20260531.md`
+- **Population-redesign hypothesis supported at benchmark level:** supported by `reports/phase4_population_redesign_benchmark_20260531.html` and `reports/phase4_population_redesign_decision_20260531.md`, where the benchmark retainable segment (~34.8% of customers) showed stronger aggregate holdout lift (~2.81 pp) than the structural segment (~0.94 pp)
+- **Calibration evidence now made explicit on the canonical V2C line:** supported by `notebooks/05_model_evaluation_diagnostics.ipynb`, `data/processed/churn_calibration_comparison_20260519.csv`, and `reports/model_diagnostics_20260519.html`. The executive summary now states the result directly: **Isotonic** achieved the smallest mean calibration gap (`0.0082`), **sigmoid** preserved the original ranking while sharply improving reliability, and the final conclusion remains **ranking-first baseline, not a fully probability-led production policy**.
+- **No automatic `v4.0.0` retraining release:** the benchmark result is strong enough to justify the redesign hypothesis, but not to silently replace the canonical V2C baseline without a separately approved retraining workstream
+
+#### What remains outside the current scope
+- true live customer outcome telemetry and production-observed campaign lift
+- a real `v4.0.0` retraining / redeployment line based on the redesign benchmark
+- ROI-optimized operational thresholding backed by observed business outcomes
+- uplift / incremental-response modeling beyond the current churn-risk framing
+
+**Justification:** this repository is intentionally scoped as a portfolio/demo system. The code and logic are real, but the campaign-response evidence used in Phase 4 remains synthetic by design and is labeled explicitly whenever it affects measurement or business-performance interpretation.
 
 ### Interpretation
 
-The canonical V2C artifact line is technically complete and operationally much stronger than the original baseline in ranking quality. However, the core analytical caveat remains: the target is still highly positive-heavy, so calibration and threshold interpretation must remain cautious.
+The canonical V2C artifact line is technically complete and operationally coherent. The updated diagnostics now make the interpretation more precise: raw scores remain strong for ranking, sigmoid materially improves probability reliability without losing ranking quality, and isotonic achieves the smallest average calibration gap (`0.0082`) with a mild ranking tradeoff (`ROC AUC 0.7919` vs `0.8016` raw/sigmoid). The practical conclusion is now explicit in the report itself: the project has **better-calibrated probability variants available**, but the baseline should still be communicated as **ranking-first** rather than as a literally calibrated production risk engine.
 
 ---
 
@@ -456,7 +529,7 @@ RAW SQLITE DATA
 
 ![n8n workflow diagram](assets/images/n8n_workflow_phase2.png)
 
-> **Main pipeline (V9, executed in production and later hardened on 2026-05-26):** Cron-triggered daily pipeline: reads all eligible customers with `send_action_flag = TRUE` from the `churn_predictions` Postgres table, fetches SHAP explainability data from the internal scoring API, merges both inputs on `customer_unique_id`, and routes customers by churn probability via a Rules switch with three branches: high risk (≥ 0.75), medium risk (0.45–0.75), and low risk (< 0.45). HIGH and MEDIUM continue through coupon generation, pre-send validation, email dispatch (SMTP), optional push dispatch via OneSignal (credentials managed through n8n Variables `ONE_SIGNAL_API_KEY` / `ONE_SIGNAL_APP_ID`), and parameterized action logging. LOW-risk records are intentionally not dispatched yet; they are written to `retention_actions_skipped` with reason code `low_tier_dispatch_deferred_td12` so the audit trail remains complete while passive LOW-tier activation is deferred.
+> **Main pipeline (V9, executed in production and later hardened on 2026-05-31):** Cron-triggered daily pipeline: reads all eligible customers with `send_action_flag = TRUE` from the `churn_predictions` Postgres table, fetches SHAP explainability data from the internal scoring API, merges both inputs on `customer_unique_id`, and routes customers through the canonical emitted `risk_tier` contract instead of recomputing HIGH/MEDIUM from stale hardcoded thresholds. HIGH and MEDIUM continue through coupon generation, pre-send validation, email dispatch (SMTP), optional push dispatch via OneSignal (credentials managed through n8n Variables `ONE_SIGNAL_API_KEY` / `ONE_SIGNAL_APP_ID`), and parameterized action logging. LOW-risk records are intentionally not dispatched yet; they are written to `retention_actions_skipped` with reason code `low_tier_dispatch_deferred_td12` so the audit trail remains complete while passive LOW-tier activation is deferred.
 >
 > **Error handler (VivaMarket Error Handler):** A separate two-node workflow — Error Trigger → Send Error Email — connected to the main V9 pipeline through n8n's native Error Workflow setting. This two-workflow pattern was adopted to avoid the known n8n canvas issue where inline error nodes can be incorrectly auto-wired as main connections. The error handler fires automatically on any uncontrolled failure in the main pipeline during scheduled production runs and emails the DS team with workflow name, failing node, timestamp, and error detail.
 >
@@ -524,10 +597,15 @@ Examples from the canonical pipeline artifact run (`20260506`) that the downstre
 
 ### Reporting and orchestration outputs
 
-- `reports/model_diagnostics_20260506.html`
-- `reports/churn_explainability_20260506.html`
-- `reports/n8n_orchestration_20260506.html`
-- `reports/churn_monitoring_dashboard_20260506.html`
+- `reports/model_diagnostics_20260519.html`
+- `reports/churn_explainability_20260519.html`
+- `reports/n8n_orchestration_20260519.html`
+- `reports/phase4_bi_dashboard_demo.html`
+- `reports/phase4_campaign_kpi_monitor_latest.html` — internal technical KPI monitor
+- `reports/phase4_governance_monitor_latest.html` — internal technical governance monitor
+- `reports/phase4_population_redesign_benchmark_20260531.html`
+- `reports/model_card_v3_phase4_demo_20260531.md`
+- `reports/archive/` — historical superseded report artifacts kept only for private/local traceability and excluded from the public GitHub package
 - `n8n/n8n_workflow_daily_churn_retention_workflow.json` — main pipeline V9 (Phase 2 executed and validated 2026-05-18; Phase 3B hardening aligned 2026-05-26)
 - `n8n/n8n_workflow_error_handler_workflow.json` — VivaMarket Error Handler (Phase 2, separate error workflow)
 - `assets/images/n8n_workflow_phase2.png` — visual diagram of the orchestration workflow
@@ -542,17 +620,46 @@ daily-customer-churn-predictor/
 ├── .gitignore
 ├── requirements.txt
 ├── STATUS.md
-├── RELEASE_NOTES_v1.md
+├── RELEASE_NOTES.md
 ├── Dockerfile
 ├── .dockerignore
 ├── notebooks/
+│   ├── 01_data_cleaning.ipynb
+│   ├── 02_eda_exploratory.ipynb
+│   ├── 03_feature_engineering.ipynb
+│   ├── 04_model_training.ipynb
+│   ├── 05_model_evaluation_diagnostics.ipynb
+│   ├── 06_churn_attribution_explainability.ipynb
+│   ├── 07_model_deployment_preparation.ipynb
+│   ├── 08_n8n_orchestration.ipynb
+│   └── 09_reporting_dashboard.ipynb
 ├── data/
 ├── models/
 ├── src/
+│   ├── api/
+│   │   ├── __init__.py
+│   │   └── churn_service.py
+│   ├── models/
+│   │   └── churn_scoring.py
+│   └── pipeline/
+│       ├── load_predictions.py
+│       ├── detect_conversions.py
+│       ├── campaign_kpis.py
+│       ├── phase4_bi_dashboard.py
+│       ├── phase4_governance_monitor.py
+│       └── phase4_population_redesign_benchmark.py
 ├── n8n/
 │   ├── n8n_workflow_daily_churn_retention_workflow.json
 │   └── n8n_workflow_error_handler_workflow.json
 ├── reports/
+│   ├── model_diagnostics_20260519.html
+│   ├── churn_explainability_20260519.html
+│   ├── n8n_orchestration_20260519.html
+│   ├── phase4_bi_dashboard_demo.html
+│   ├── phase4_campaign_kpi_monitor_latest.html
+│   ├── phase4_governance_monitor_latest.html
+│   ├── phase4_population_redesign_benchmark_20260531.html
+│   └── model_card_v3_phase4_demo_20260531.md
 ├── tests/
 ├── assets/
 │   └── images/
@@ -619,12 +726,12 @@ The production-grade customer-facing automation — oriented to scalable channel
 ## Known Limitations
 
 1. Even after the `V2C` redesign, the churn target remains highly positive-heavy.
-2. Calibration should be interpreted cautiously despite strong ranking metrics.
+2. Calibration should still be interpreted cautiously despite the new evidence: sigmoid materially improves reliability and isotonic lowers average decile gap further, but the target remains highly positive-heavy.
 3. Explainability is sampled rather than full-population SHAP.
 4. Operational thresholds are still strategy-oriented rather than fully ROI-optimized.
 5. The n8n workflow is the current internal orchestration platform; it is strong enough for internal pilot / controlled validation framing, but it should not yet be presented as the final customer-facing delivery layer.
 6. The current ROI layer is scenario-based and useful for stakeholder discussion, but it is not causal or experimentally validated.
-7. The feedback loop is not live yet: event capture, conversion attribution, and observed campaign-performance measurement still belong to the next implementation phase.
+7. The feedback loop is implemented only at portfolio/demo level: synthetic event capture, synthetic conversion attribution, and synthetic campaign-performance measurement exist, but live observed customer response telemetry is still outside scope.
 8. Explainability artifact lineage for the later 20260519 state should still be documented more explicitly so the canonical post-Phase-3B handoff is unambiguous.
 
 ---
@@ -651,39 +758,30 @@ The production-grade customer-facing automation — oriented to scalable channel
 
 ### Strategic sequencing recommendation
 
-1. Preserve explicit comparability between the historical **v1.0.0** baseline and the current **canonical V2C / Phase 3B** state.
-2. Treat **Phase 4** as the next concrete implementation stage after publishing `v3.0.0-phase3b`.
-3. Reopen deeper analytical redesign only after operational measurement data exists and the business-first population question can be revisited with evidence.
+1. Preserve explicit comparability between the historical **v1.0.0** baseline, the **canonical V2C** redesign, and the current **Phase 4 demo baseline**.
+2. Treat the current repository state as a strong **portfolio/demo release candidate**, not as an unfinished pre-Phase-4 draft.
+3. Reopen deeper analytical redesign only after either real-world validation evidence exists or a separately approved retraining workstream is opened from the benchmark result.
 
 ---
 
 ## Future Work
 
-### Phase 4 — Next implementation stage
+### Post-Phase-4 extensions (outside the current closed scope)
 
-1. Publish release `v3.0.0-phase3b` on GitHub as the formal start gate.
-2. Resolve TD-14 by documenting or regenerating the canonical explainability artifact lineage for the post-Phase-3B baseline.
-3. Configure OneSignal with real credentials and verify `external_id = customer_unique_id` in the effective dispatch path.
-4. Activate LOW-tier dispatch only after governance conditions are satisfied, replacing `low_tier_dispatch_deferred_td12` with real controlled delivery.
-5. Implement the feedback loop: OneSignal webhook receiver, `retention_events`, conversion detection, and campaign KPI capture.
-6. Add governance and monitoring: weekly drift checks, feature-stability checks, and an evidence-enriched Model Card.
-7. Build the BI/dashboard layer in demo mode first, then switch to live mode once enough campaign data exists.
-
-### Longer-term analytical evolution
-
-1. Revisit churn-eligibility population design from a business-first perspective.
-2. Refine the churn target if the observed feedback loop supports a better retainable-population definition.
-3. Add predictive CLV as a parallel decision layer.
-4. Recalibrate thresholds with observed ROI logic instead of scenario assumptions only.
-5. Implement structured cohort analysis.
-6. Add uplift / incremental-response modeling.
-7. Re-run the downstream notebook chain only if the analytical base changes materially.
+1. Publish a new public release that explicitly documents the full Phase 4 demo closure.
+2. Convert the Block F benchmark into a separately approved retraining workstream if the redesign hypothesis should be implemented, not just benchmarked.
+3. Replace synthetic campaign-response evidence with true observed customer outcome telemetry if the project is ever promoted beyond portfolio/demo scope.
+4. Recalibrate operational thresholds using observed ROI evidence instead of scenario assumptions only.
+5. Add predictive CLV as a parallel decision layer.
+6. Implement structured cohort analysis.
+7. Add uplift / incremental-response modeling.
+8. Re-run the downstream notebook chain only if the analytical base changes materially.
 
 ---
 
 ## Version Note
 
-This README documents the **current synchronized canonical V2C artifact line with Phase 2 complete and Phase 3B operationally closed for the internal-pilot scope**. The earlier GitHub publication corresponded to the **v1.0.0 baseline**. The next public release should preserve explicit comparability between that historical baseline and the current Phase 3B state, document the n8n V9 operational validation plus LOW-tier governance-safe routing, and position **Phase 4** as the next implementation stage for event tracking, governed channel activation, and BI/dashboard evolution.
+This README documents the **current `v4.0.0-phase4-demo` portfolio baseline** built on top of the synchronized canonical V2C artifact line. The earlier GitHub publication corresponded to the historical **v1.0.0 baseline**. The current local state should therefore be read as: historical public `v1.0.0` baseline → canonical V2C analytical redesign → Phase 2 orchestration validation → Phase 3B publication hardening → Phase 4 simulated measurement / governance / benchmark closure. Any future public release should preserve that comparability chain explicitly instead of flattening it into a single-version story.
 
 ---
 
@@ -702,9 +800,9 @@ If you reuse ideas or workflow patterns from this repository, attribution is app
 
 ---
 
-**Last Updated:** May 26, 2026  
-**Canonical artifact line:** 20260506 · n8n V9  
-**Status:** NB01–NB09 Complete · Phase 2 Complete · n8n V9 Executed (two-workflow architecture) · Phase 3B Operational Baseline Closed · Publication Layer Synchronized · v1.0.0 Baseline Published · Canonical V2C Artifact Line Active · Phase 4 Plan Defined
+**Last Updated:** May 31, 2026  
+**Canonical artifact line:** 20260506 · n8n V9 · Phase 4 demo closure  
+**Status:** NB01–NB09 Complete · Phase 2 Complete · n8n V9 Executed (two-workflow architecture) · Phase 3B Operational Baseline Closed · Publication Layer Synchronized · v1.0.0 Baseline Published · Canonical V2C Artifact Line Active · Phase 4 Closed at Portfolio/Demo Benchmark Level
 
 ---
 

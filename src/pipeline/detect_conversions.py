@@ -1,7 +1,7 @@
 import logging
 import os
-from datetime import datetime, timedelta, timezone
 from pathlib import Path
+import json
 
 import pandas as pd
 from sqlalchemy import create_engine, text
@@ -12,7 +12,21 @@ logger = logging.getLogger(__name__)
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_OPS_DB_URL = os.getenv("CHURN_DB_URL", f"sqlite:///{PROJECT_ROOT / 'data' / 'raw' / 'churn_sqlite_db.sqlite'}")
 DEFAULT_SOURCE_DB_URL = os.getenv("SOURCE_DB_URL", f"sqlite:///{PROJECT_ROOT / 'data' / 'raw' / 'churn_sqlite_db.sqlite'}")
-CONVERSION_WINDOW_DAYS = int(os.getenv("CONVERSION_WINDOW_DAYS", "14"))
+DEFAULT_CONVERSION_WINDOWS = {"HIGH": 14, "MEDIUM": 21, "LOW": 30}
+
+
+def _resolve_conversion_windows() -> dict[str, int]:
+    windows = DEFAULT_CONVERSION_WINDOWS.copy()
+    for tier, env_name in {
+        "HIGH": "CONVERSION_WINDOW_DAYS_HIGH",
+        "MEDIUM": "CONVERSION_WINDOW_DAYS_MEDIUM",
+        "LOW": "CONVERSION_WINDOW_DAYS_LOW",
+    }.items():
+        raw_value = os.getenv(env_name)
+        if raw_value is None:
+            continue
+        windows[tier] = int(raw_value)
+    return windows
 
 
 def _ensure_retention_events_table(engine) -> None:
@@ -45,7 +59,7 @@ def _ensure_retention_events_table(engine) -> None:
 def _load_candidate_actions(ops_engine) -> pd.DataFrame:
     query = text(
         """
-        SELECT DISTINCT customer_unique_id, run_date_tag, coupon_code, executed_at, channel
+        SELECT DISTINCT customer_unique_id, run_date_tag, coupon_code, executed_at, channel, risk_tier, holdout
         FROM retention_actions
         WHERE executed_at IS NOT NULL
         """
@@ -77,6 +91,7 @@ def _load_orders(source_engine) -> pd.DataFrame:
 
 
 def detect_conversions(ops_engine, source_engine) -> int:
+    conversion_windows = _resolve_conversion_windows()
     actions = _load_candidate_actions(ops_engine)
     if actions.empty:
         logger.info("No retention actions found; nothing to detect")
@@ -94,10 +109,16 @@ def detect_conversions(ops_engine, source_engine) -> int:
         logger.info("No orders match any retention action customers")
         return 0
 
-    merged["window_end"] = merged["executed_at"] + pd.to_timedelta(CONVERSION_WINDOW_DAYS, unit="D")
+    merged["risk_tier"] = merged["risk_tier"].fillna("MEDIUM").astype(str).str.upper()
+    invalid_tiers = sorted(set(merged["risk_tier"]) - set(conversion_windows))
+    if invalid_tiers:
+        raise ValueError(f"Unsupported risk_tier values found in retention_actions: {invalid_tiers}")
+
+    merged["conversion_window_days"] = merged["risk_tier"].map(conversion_windows)
+    merged["window_end"] = merged["executed_at"] + pd.to_timedelta(merged["conversion_window_days"], unit="D")
     eligible = merged[(merged["order_ts"] >= merged["executed_at"]) & (merged["order_ts"] <= merged["window_end"])].copy()
     if eligible.empty:
-        logger.info("No conversions found within the %s-day window", CONVERSION_WINDOW_DAYS)
+        logger.info("No conversions found within the tier-specific attribution windows")
         return 0
 
     eligible = eligible.sort_values(["customer_unique_id", "run_date_tag", "order_ts"]).drop_duplicates(
@@ -105,9 +126,14 @@ def detect_conversions(ops_engine, source_engine) -> int:
     )
     eligible["event_ts"] = eligible["order_ts"].dt.strftime("%Y-%m-%d %H:%M:%S")
     eligible["metadata"] = eligible.apply(
-        lambda row: (
-            '{"conversion_window_days": %d, "coupon_code": "%s"}'
-            % (CONVERSION_WINDOW_DAYS, (row["coupon_code"] or ""))
+        lambda row: json.dumps(
+            {
+                "conversion_window_days": int(row["conversion_window_days"]),
+                "coupon_code": row["coupon_code"] or "",
+                "risk_tier": row["risk_tier"],
+                "holdout": bool(row["holdout"]) if pd.notna(row["holdout"]) else False,
+            },
+            ensure_ascii=False,
         ),
         axis=1,
     )

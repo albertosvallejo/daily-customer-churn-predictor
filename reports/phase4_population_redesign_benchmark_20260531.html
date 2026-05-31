@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head><meta charset='utf-8' /><title>Phase 4 Population Redesign Benchmark</title>
+<style>
+:root{--bg:#f5f7fa;--surface:#ffffff;--surface-soft:#f8fafc;--text:#1f2937;--muted:#5b6472;--border:#d9e2ec;--brand:#005090;--high:#C01010;--medium:#E0B000;--low:#208040;--demo:#8a5a00;--demo-bg:#fff3cd;--decision:#eaf2fb;} *{box-sizing:border-box} body{font-family:Arial,sans-serif;background:var(--bg);color:var(--text);margin:0;line-height:1.45} .wrap{max-width:1240px;margin:0 auto;padding:28px 20px 40px} .hero,.panel,.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 6px 16px rgba(15,23,42,.05)} .hero{padding:24px} .hero-top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap} .brand{display:flex;align-items:center;gap:14px} .brand img{height:44px;width:auto;border-radius:8px} .eyebrow{color:var(--brand);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase} .hero h1,.panel h2{margin:8px 0 10px} .hero p,.panel p,.meta,li{color:var(--muted)} .pill,.tier{display:inline-block;padding:7px 11px;border-radius:999px;font-size:12px;font-weight:700} .pill{background:var(--demo-bg);color:var(--demo)} .tier-high{background:#fdecec;color:var(--high)} .tier-medium{background:#fff7db;color:#8a6a00} .tier-low{background:#eaf7ef;color:var(--low)} .summary{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:18px} .callout{background:var(--surface-soft);border:1px solid var(--border);border-radius:14px;padding:16px} .decision{background:var(--decision)} .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:18px} .card{padding:16px} .label{color:var(--muted);font-size:13px} .metric{font-size:30px;font-weight:700;margin-top:8px;color:var(--brand)} .panel{padding:20px;margin-top:18px} .section-kicker{color:var(--brand);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em} table{width:100%;border-collapse:collapse;margin-top:10px;background:var(--surface)} th,td{padding:11px 10px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top} th{color:var(--muted);background:var(--surface-soft)} ul{margin:10px 0 0 18px;padding:0} .meta{font-size:13px;margin-top:10px} @media (max-width:860px){.summary{grid-template-columns:1fr}}
+</style></head>
+<body><div class='wrap'>
+<div class='hero'>
+  <div class='hero-top'>
+    <div class='brand'>
+      <img src='../assets/images/logo.gif' alt='VivaMarket logo' />
+      <div>
+        <div class='eyebrow'>Phase 4 benchmark surface</div>
+        <h1>Phase 4 Population Redesign Benchmark</h1>
+        <p>Decision benchmark for the retainable-vs-structurally-single-purchase redesign hypothesis using the current portfolio evidence layer.</p>
+      </div>
+    </div>
+    <div>
+      <div class='meta'>Run date: 2026-05-31 · Baseline: canonical V2C</div>
+    </div>
+  </div>
+  <div class='summary'>
+    <div class='callout'>
+      <div class='section-kicker'>Executive summary</div>
+      <p><strong>What this means:</strong> the benchmark supports a credible redesign hypothesis, but it does not by itself authorize a production retraining claim.</p>
+      <p><strong>Caveat:</strong> this benchmark supports portfolio reasoning and roadmap prioritization, not a live causal-superiority claim.</p>
+    </div>
+    <div class='callout decision'>
+      <div class='section-kicker'>Decision implication</div>
+      <p><strong>Decision:</strong> support population redesign candidate</p>
+      <p class='meta'>Use this view to judge whether the retainable segment is strong enough to justify a later explicit redesign workstream.</p>
+    </div>
+  </div>
+  <div class='grid'>
+    <div class='card'><div class='label'>Customers benchmarked</div><div class='metric'>3,346</div></div>
+    <div class='card'><div class='label'>Closed evaluations</div><div class='metric'>124,740</div></div>
+    <div class='card'><div class='label'>Retainable customers</div><div class='metric'>1,163</div></div>
+    <div class='card'><div class='label'>Structural customers</div><div class='metric'>2,183</div></div>
+  </div>
+</div>
+<div class='panel'><div class='section-kicker'>Primary comparison</div><h2>Segment summary</h2><p>Compares the candidate retainable population against the structurally single-purchase segment on evaluation depth, conversion behavior, and holdout-relative signal.</p><table><thead><tr><th>Segment</th><th>Customers</th><th>Avg closed evals</th><th>Avg conversion rate</th><th>Avg treated CR</th><th>Avg holdout CR</th><th>Avg holdout lift</th><th>Avg score</th></tr></thead><tbody><tr><td>Retainable</td><td>1163</td><td>41.4</td><td>17.07%</td><td>17.36%</td><td>14.56%</td><td>2.81%</td><td>0.6605</td></tr><tr><td>Structural Single Purchase</td><td>2183</td><td>35.1</td><td>5.95%</td><td>6.37%</td><td>5.43%</td><td>0.94%</td><td>0.4506</td></tr></tbody></table></div>
+<div class='panel'><div class='section-kicker'>Behavioral composition</div><h2>Tier mix by segment</h2><p>Shows whether the redesign candidate is concentrated in stronger operational tiers or mostly reflects lower-value baseline behavior.</p><table><thead><tr><th>Segment</th><th>Dominant tier</th><th>Customers</th></tr></thead><tbody><tr><td>Retainable</td><td><span class='tier tier-high'>HIGH</span></td><td>527</td></tr><tr><td>Retainable</td><td><span class='tier tier-low'>LOW</span></td><td>98</td></tr><tr><td>Retainable</td><td><span class='tier tier-medium'>MEDIUM</span></td><td>538</td></tr><tr><td>Structural Single Purchase</td><td><span class='tier tier-high'>HIGH</span></td><td>163</td></tr><tr><td>Structural Single Purchase</td><td><span class='tier tier-low'>LOW</span></td><td>1078</td></tr><tr><td>Structural Single Purchase</td><td><span class='tier tier-medium'>MEDIUM</span></td><td>942</td></tr></tbody></table></div>
+<div class='panel'><div class='section-kicker'>Illustrative examples</div><h2>Top retainable examples</h2><p>Representative customers from the strongest candidate segment, shown for interpretability rather than for direct production targeting.</p><table><thead><tr><th>Customer</th><th>Tier</th><th>Closed evals</th><th>Conversion rate</th><th>Holdout lift</th><th>Avg score</th></tr></thead><tbody><tr><td>CUST_02220</td><td><span class='tier tier-high'>HIGH</span></td><td>46</td><td>34.78%</td><td>—</td><td>0.7918</td></tr><tr><td>CUST_02307</td><td><span class='tier tier-high'>HIGH</span></td><td>46</td><td>34.78%</td><td>—</td><td>0.9873</td></tr><tr><td>CUST_03010</td><td><span class='tier tier-high'>HIGH</span></td><td>46</td><td>34.78%</td><td>—</td><td>0.7215</td></tr><tr><td>CUST_00966</td><td><span class='tier tier-medium'>MEDIUM</span></td><td>39</td><td>33.33%</td><td>—</td><td>0.4699</td></tr><tr><td>CUST_00006</td><td><span class='tier tier-high'>HIGH</span></td><td>46</td><td>32.61%</td><td>—</td><td>0.8962</td></tr><tr><td>CUST_00704</td><td><span class='tier tier-high'>HIGH</span></td><td>46</td><td>32.61%</td><td>—</td><td>0.7207</td></tr><tr><td>CUST_01967</td><td><span class='tier tier-high'>HIGH</span></td><td>46</td><td>32.61%</td><td>—</td><td>0.8543</td></tr><tr><td>CUST_03329</td><td><span class='tier tier-high'>HIGH</span></td><td>46</td><td>32.61%</td><td>—</td><td>0.8082</td></tr><tr><td>CUST_00300</td><td><span class='tier tier-high'>HIGH</span></td><td>46</td><td>30.43%</td><td>—</td><td>0.9561</td></tr><tr><td>CUST_00651</td><td><span class='tier tier-high'>HIGH</span></td><td>46</td><td>30.43%</td><td>—</td><td>0.7535</td></tr></tbody></table></div>
+<div class='panel'><div class='section-kicker'>Decision output</div><h2>Decision rationale</h2><ul><li>The benchmark uses the current portfolio evidence layer.</li><li>This is a portfolio/demo redesign benchmark, not a production-observed retraining decision.</li><li>Retainable customers show stronger average holdout lift than the structurally single-purchase segment, supporting the redesign hypothesis.</li></ul></div>
+</div></body></html>
