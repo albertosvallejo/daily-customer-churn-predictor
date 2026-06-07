@@ -13,13 +13,13 @@
 
 ## Executive Summary
 
-> **READ THIS FIRST — WHAT THIS REPOSITORY IS NOW:** this repository documents the current **canonical V2C analytical line** and the **Phase 4 portfolio/demo baseline**. The project is technically real in its notebooks, scoring logic, API, orchestration, reporting, and governance artifacts, but the campaign-response measurement used in Phase 4 is still based on a **simulated campaign baseline**, not live customer telemetry.
+This repository presents a **portfolio-grade churn intelligence system** for VivaMarket Brasil, built on **real ecommerce data** and designed as a full analytical-to-operational workflow rather than as a standalone model notebook. It covers the path from raw SQLite extraction to feature engineering, churn scoring, explainability outputs, automation-ready retention payloads, governance artifacts, and business-facing HTML reporting.
 
-This is a **personal deep-dive project** built after completing a Master's in Data Science to gain hands-on experience with production-oriented churn modeling in a realistic marketplace setting. It implements a **complete end-to-end churn workflow** for VivaMarket Brasil, covering the full path from raw SQLite extraction to scored retention queues, explainability outputs, automation-ready payloads, governance surfaces, and business-facing HTML reporting.
+The current repository baseline is the **canonical V2C analytical line** plus the **Phase 4 portfolio baseline**. In practical terms, that means the technical system is implemented end to end: notebooks, model training, scoring package, API, orchestration logic, KPI reporting, calibration analysis, governance surfaces, and decision-layer benchmarking are all part of the delivered artifact set.
 
-The repository is intentionally framed as more than a model notebook chain: it documents the full progression from analytical redesign into an **internal pilot / controlled operational activation baseline**, and then into a **Phase 4 portfolio measurement and governance layer**. The scope boundary is explicit: this is strong portfolio/demo evidence, not a claim of live production-observed campaign performance.
+The project is intentionally positioned as a **senior portfolio demonstration of a realistic churn workflow**. Its strongest contribution is not only model performance, but the way it handles the harder parts of marketplace churn work: ambiguous churn definition, one-time-buyer dominance, temporal consistency, calibration tradeoffs, governance needs, and the translation of model outputs into operational retention decisions.
 
-The goal was to go beyond a typical academic churn notebook and build a pipeline that addresses the real challenges of marketplace churn: irregular purchase behavior, analytically complex target definition, temporal consistency requirements, calibration tradeoffs, governance needs, and the translation of model scores into operational business decisions.
+Phase 4 is presented with the correct evidence boundary: the repository includes a **measurement and governance baseline**, but the campaign-response layer is documented as a **simulated evaluation environment** rather than as live customer-impact evidence. That scope choice is deliberate and keeps the project honest without weakening its technical depth.
 
 **Development approach:** This project was built using **The Architect (v1)**, a personal **Spec-Driven Data Science agent/workflow** developed alongside the project. Every notebook was analytically specified before being built, executed with OpenClaw agent support, and reviewed under explicit human supervision before the next step was started. The workflow prioritizes traceability, notebook-by-notebook QA, and clean versioned evolution over execution speed.
 
@@ -30,7 +30,7 @@ The goal was to go beyond a typical academic churn notebook and build a pipeline
 | Analytical line | Canonical `V2C` | Current scoring and decision baseline documented in the repo |
 | Operational baseline | Phase 2 / Phase 3B complete | API + n8n + reporting chain already implemented and validated |
 | Current portfolio baseline | `v4.0.0-phase4-demo` | Adds measurement, governance, benchmark reasoning, and publication hardening |
-| Measurement scope | Simulated campaign baseline | Honest boundary: no false claim of live observed campaign lift |
+| Measurement scope | Portfolio evaluation baseline | Measurement and governance are implemented; live customer-response evidence is intentionally out of scope |
 
 ### Canonical V2C artifact line — key metrics and decisions
 
@@ -75,29 +75,29 @@ The correct public interpretation is therefore precise: the project has **credib
 
 ## Quick Start
 
-> **Current status:** NB01–NB09 are complete on the canonical line. Phase 2 orchestration is implemented and validated, Phase 3B publication hardening is closed for the internal-pilot scope, and the current portfolio baseline is **`v4.0.0-phase4-demo`**: simulated measurement, KPI monitoring, governance/drift reporting, calibration evidence, stakeholder BI reporting, and a benchmarked population-redesign decision layer are all already documented.
+> **Current status:** NB01–NB09 are complete on the canonical line. Phase 2 orchestration is implemented and validated, Phase 3B publication hardening is closed, and the current repository baseline is **`v4.0.0-phase4-demo`** with KPI monitoring, governance/drift reporting, calibration evidence, stakeholder BI reporting, and a documented population-redesign benchmark.
 
-> **How to read this repo:** the code and analytical workflow are real; the Phase 4 campaign-response measurement layer is still portfolio/demo-scoped because it relies on a simulated campaign baseline rather than live customer telemetry.
+> **How to read this repo:** this is a complete churn intelligence workflow, not only a modeling exercise. Review it as an end-to-end system covering scoring, explainability, orchestration, reporting, governance, and measurement design.
 
-> **Main takeaway:** this repository is no longer only about building a churn model. It now shows how the system is scored, interpreted, orchestrated, measured, governed, and challenged analytically after deployment.
+> **Main takeaway:** the repository demonstrates how a churn model becomes an operational decision layer with traceable artifacts, business-facing outputs, and explicit analytical boundaries.
 
-> **Calibration outcome:** isotonic wins on mean calibration gap, sigmoid preserves ranking best, and the correct portfolio conclusion remains **ranking-first baseline** rather than probability-led production policy.
+> **Calibration outcome:** isotonic wins on mean calibration gap, sigmoid preserves ranking best, and the recommended interpretation remains **ranking-first baseline** rather than probability-led production policy.
 
 > **Best next reader path:** Executive Summary → Results & Performance → Phase 4 closure summary → Version Note.
 
 > **Main evidence artifacts to open first:** `reports/model_diagnostics_20260519.html`, `reports/phase4_governance_monitor_latest.html`, `reports/phase4_population_redesign_benchmark_20260531.html`, and `reports/phase4_bi_dashboard_demo.html`.
 
-> **Public data note:** the raw SQLite source is public and downloadable from Kaggle, but excluded from versioned scope because of size.
+> **Business-facing overview:** `reports/vivamarket_churn_business_deck_20260531.pptx` — executive summary of the full system, Phase 4 baseline, project roadmap, and honest scope boundaries. Start here if you are not reading the technical artifacts.
 
-> **Scope honesty:** the current portfolio baseline demonstrates strong technical execution and analytical maturity, but it does not claim live observed campaign lift or experimentally validated ROI.
+> **Public data note:** the raw SQLite source is public and downloadable from Kaggle, but excluded from versioned scope because of size.
 
 > **Comparability rule:** any version-to-version comparison belongs in **Project Evolution**, not in the executive framing of current project performance.
 
-> **Release framing:** if published now, this repository should be positioned as the current **Phase 4 portfolio/demo baseline**, not as a live production case study.
+> **Release framing:** this repository should be read as a **portfolio-grade operational churn baseline** built on real data, with a documented Phase 4 evaluation layer designed for demo/portfolio scope rather than live causal business claims.
 
-> **Why this matters:** the most senior part of the project is not just the model metrics — it is the explicit decision logic around calibration, governance, measurement scope, and redesign evidence.
+> **Why this matters:** the most senior part of the project is not just the model metrics — it is the explicit decision logic around calibration, governance, measurement design, and retainable-population strategy.
 
-> **Bottom line:** this is a stronger portfolio piece precisely because it is technically ambitious and explicit about its evidence boundaries.
+> **Bottom line:** this is a technically ambitious, operationally structured, and analytically honest portfolio project.
 
 ### Running the notebook pipeline
 
@@ -605,6 +605,7 @@ Examples from the canonical pipeline artifact run (`20260506`) that the downstre
 - `reports/phase4_governance_monitor_latest.html` — internal technical governance monitor
 - `reports/phase4_population_redesign_benchmark_20260531.html`
 - `reports/model_card_v3_phase4_demo_20260531.md`
+- `reports/vivamarket_churn_business_deck_20260531.pptx
 - `reports/archive/` — historical superseded report artifacts kept only for private/local traceability and excluded from the public GitHub package
 - `n8n/n8n_workflow_daily_churn_retention_workflow.json` — main pipeline V9 (Phase 2 executed and validated 2026-05-18; Phase 3B hardening aligned 2026-05-26)
 - `n8n/n8n_workflow_error_handler_workflow.json` — VivaMarket Error Handler (Phase 2, separate error workflow)
@@ -659,7 +660,8 @@ daily-customer-churn-predictor/
 │   ├── phase4_campaign_kpi_monitor_latest.html
 │   ├── phase4_governance_monitor_latest.html
 │   ├── phase4_population_redesign_benchmark_20260531.html
-│   └── model_card_v3_phase4_demo_20260531.md
+│   ├── model_card_v3_phase4_demo_20260531.md
+│   └── vivamarket_churn_business_deck_20260531.pptx
 ├── tests/
 ├── assets/
 │   └── images/
