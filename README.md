@@ -15,11 +15,13 @@
 
 This repository presents a **portfolio-grade churn intelligence system** for VivaMarket Brasil, built on **real ecommerce data** and designed as a full analytical-to-operational workflow rather than as a standalone model notebook. It covers the path from raw SQLite extraction to feature engineering, churn scoring, explainability outputs, automation-ready retention payloads, governance artifacts, and business-facing HTML reporting.
 
-The current repository baseline is the **canonical V2C analytical line** plus the **Phase 4 portfolio baseline**. In practical terms, that means the technical system is implemented end to end: notebooks, model training, scoring package, API, orchestration logic, KPI reporting, calibration analysis, governance surfaces, and decision-layer benchmarking are all part of the delivered artifact set.
+The current repository baseline is the **canonical V2C analytical line** plus the **Phase 4 portfolio baseline**. The technical system is implemented end to end — notebooks, model training, scoring package, API, orchestration logic, KPI reporting, calibration analysis, governance surfaces, and decision-layer benchmarking — and backed by concrete results: **ROC AUC ~0.80** with **Precision@Top 5% = 1.00** on the held-out scored set, an **isotonic-calibrated variant** with mean calibration gap **0.0082** (smallest of the tested variants), full SHAP explainability (NB06), and an **n8n orchestration layer (V9)** executed end-to-end in a real production environment. Full metrics table below.
 
-The project is intentionally positioned as a **senior portfolio demonstration of a realistic churn workflow**. Its strongest contribution is not only model performance, but the way it handles the harder parts of marketplace churn work: ambiguous churn definition, one-time-buyer dominance, temporal consistency, calibration tradeoffs, governance needs, and the translation of model outputs into operational retention decisions.
+This project is designed as a realistic churn workflow that surfaces the harder parts of marketplace churn work: ambiguous churn definition, one-time-buyer dominance, temporal consistency, calibration tradeoffs, governance needs, and the translation of model outputs into operational retention decisions.
 
 Phase 4 is presented with the correct evidence boundary: the repository includes a **measurement and governance baseline**, but the campaign-response layer is documented as a **simulated evaluation environment** rather than as live customer-impact evidence. That scope choice is deliberate and keeps the project honest without weakening its technical depth.
+
+**Phase 5 added an A/B testing validation framework for retention interventions**, blind-validated against 16 known-ground-truth scenarios (13/16 correct on first pass), hardened with a redesigned safety guardrail (53/53 tests), and closed with a published case study and explicit, dated project-author sign-off. See [Phase 5 — Retention Intervention Validation Framework](#phase-5--retention-intervention-validation-framework) for the full account, including the one consciously accepted limitation and the business decisions behind closure.
 
 **Development approach:** This project was built using **The Architect (v1)**, a personal **Spec-Driven Data Science agent/workflow** developed alongside the project. Every notebook was analytically specified before being built, executed with OpenClaw agent support, and reviewed under explicit human supervision before the next step was started. The workflow prioritizes traceability, notebook-by-notebook QA, and clean versioned evolution over execution speed.
 
@@ -31,6 +33,7 @@ Phase 4 is presented with the correct evidence boundary: the repository includes
 | Operational baseline | Phase 2 / Phase 3B complete | API + n8n + reporting chain already implemented and validated |
 | Current portfolio baseline | `v4.0.0-phase4-demo` | Adds measurement, governance, benchmark reasoning, and publication hardening |
 | Measurement scope | Portfolio evaluation baseline | Measurement and governance are implemented; live customer-response evidence is intentionally out of scope |
+| Phase 5 (A/B testing framework) | ✅ Closed — case study published, sign-off obtained (2026-07-18) | Statistical framework built, blind-validated (13/16), and hardened (53/53 tests); guardrail-coverage scope decision confirmed; case study at `reports/phase5b_case_study_signoff_20260718.md` |
 
 ### Canonical V2C artifact line — key metrics and decisions
 
@@ -81,13 +84,19 @@ The correct public interpretation is therefore precise: the project has **credib
 
 > **Main takeaway:** the repository demonstrates how a churn model becomes an operational decision layer with traceable artifacts, business-facing outputs, and explicit analytical boundaries.
 
-> **Calibration outcome:** isotonic wins on mean calibration gap, sigmoid preserves ranking best, and the recommended interpretation remains **ranking-first baseline** rather than probability-led production policy.
-
 > **Best next reader path:** Executive Summary → Results & Performance → Phase 4 closure summary → Version Note.
 
-> **Main evidence artifacts to open first:** `reports/model_diagnostics_20260519.html`, `reports/phase4_governance_monitor_latest.html`, `reports/phase4_population_redesign_benchmark_20260531.html`, and `reports/phase4_bi_dashboard_demo.html`.
+### Key Portfolio Assets
 
-> **Business-facing overview:** `reports/vivamarket_churn_business_deck_20260531.pptx` — executive summary of the full system, Phase 4 baseline, project roadmap, and honest scope boundaries. Start here if you are not reading the technical artifacts.
+| Asset | What it shows |
+|:------|:--------------|
+| `reports/vivamarket_churn_business_deck_20260531.pptx` | Business-facing overview of the full system, Phase 4 baseline, roadmap, and honest scope boundaries — start here if you're not reading technical artifacts |
+| `reports/model_diagnostics_20260519.html` | Model calibration, ranking metrics, and diagnostics on the canonical V2C line |
+| `reports/phase4_governance_monitor_latest.html` | Drift monitoring and model governance surface |
+| `reports/phase4_population_redesign_benchmark_20260531.html` | Retainable-vs-structural population benchmark and decision artifact |
+| `reports/phase4_bi_dashboard_demo.html` | Stakeholder-facing KPI/BI dashboard |
+| `reports/phase6_intervention_recommendations_20260718.md` | Prioritized retention intervention recommendations and first-pilot test design (Phase 5) |
+| `reports/phase5b_case_study_signoff_20260718.md` | Full narrative case study and sign-off for the Phase 5 A/B testing validation framework |
 
 > **Public data note:** the raw SQLite source is public and downloadable from Kaggle, but excluded from versioned scope because of size.
 
@@ -173,6 +182,7 @@ The result is a working style that emphasizes structured execution, notebook-by-
 - [Modeling Approach](#modeling-approach)
 - [Project Evolution](#project-evolution)
 - [Results & Performance](#results--performance)
+- [Phase 5 — Retention Intervention Validation Framework](#phase-5--retention-intervention-validation-framework)
 - [System Architecture](#system-architecture)
 - [Notebook Pipeline Reference](#notebook-pipeline-reference)
 - [Main Deliverables](#main-deliverables)
@@ -278,6 +288,17 @@ Raw SQLite data
 → deployment preparation (scoring package)
 → retention orchestration design + execution (n8n)
 → branded HTML reporting dashboard
+```
+
+This is the deployed operational pipeline. Phase 5 is a separate, offline capability that sits alongside it — it validates whether a *candidate* retention intervention is safe and effective **before** it would ever be handed to the orchestration layer above, using synthetic scenarios rather than live customers:
+
+```text
+Candidate intervention (copy / timing / channel / incentive)
+→ literature-grounded proposal
+→ A/B test against synthetic, known-ground-truth scenarios (blind validation)
+→ safety guardrail check (Power Guardrail)
+→ verdict: winner / no-effect / insufficient signal
+→ prioritized recommendation (for a future real pilot, not yet executed)
 ```
 
 ### Data Foundation
@@ -482,7 +503,7 @@ The current synchronized local chain is complete through:
 - **Phase 4 demo measurement baseline accepted:** supported by `retention_actions_synthetic_30d.parquet`, `retention_events_synthetic_30d.parquet`, and the KPI monitor outputs
 - **Block D governance baseline accepted:** supported by `reports/phase4_governance_monitor_latest.html`, `data/processed/phase4_governance_monitor_latest.json`, and `reports/model_card_v3_phase4_demo_20260531.md`
 - **Population-redesign hypothesis supported at benchmark level:** supported by `reports/phase4_population_redesign_benchmark_20260531.html` and `reports/phase4_population_redesign_decision_20260531.md`, where the benchmark retainable segment (~34.8% of customers) showed stronger aggregate holdout lift (~2.81 pp) than the structural segment (~0.94 pp)
-- **Calibration evidence now made explicit on the canonical V2C line:** supported by `notebooks/05_model_evaluation_diagnostics.ipynb`, `data/processed/churn_calibration_comparison_20260519.csv`, and `reports/model_diagnostics_20260519.html`. The executive summary now states the result directly: **Isotonic** achieved the smallest mean calibration gap (`0.0082`), **sigmoid** preserved the original ranking while sharply improving reliability, and the final conclusion remains **ranking-first baseline, not a fully probability-led production policy**.
+- **Calibration evidence made explicit on the canonical V2C line:** supported by `notebooks/05_model_evaluation_diagnostics.ipynb`, `data/processed/churn_calibration_comparison_20260519.csv`, and `reports/model_diagnostics_20260519.html` — see [Why the calibration result matters](#why-the-calibration-result-matters) for the full interpretation.
 - **No automatic `v4.0.0` retraining release:** the benchmark result is strong enough to justify the redesign hypothesis, but not to silently replace the canonical V2C baseline without a separately approved retraining workstream
 
 #### What remains outside the current scope
@@ -495,7 +516,63 @@ The current synchronized local chain is complete through:
 
 ### Interpretation
 
-The canonical V2C artifact line is technically complete and operationally coherent. The updated diagnostics now make the interpretation more precise: raw scores remain strong for ranking, sigmoid materially improves probability reliability without losing ranking quality, and isotonic achieves the smallest average calibration gap (`0.0082`) with a mild ranking tradeoff (`ROC AUC 0.7919` vs `0.8016` raw/sigmoid). The practical conclusion is now explicit in the report itself: the project has **better-calibrated probability variants available**, but the baseline should still be communicated as **ranking-first** rather than as a literally calibrated production risk engine.
+The canonical V2C artifact line is technically complete and operationally coherent. Isotonic achieves the smallest average calibration gap (`0.0082`) with a mild ranking tradeoff (ROC AUC `0.7919` vs `0.8016` raw/sigmoid) — reinforcing the ranking-first interpretation already established above: better-calibrated probability variants exist, but the baseline should still be communicated as ranking-first rather than as a literally calibrated production risk engine.
+
+---
+
+## Phase 5 — Retention Intervention Validation Framework
+
+**Status: ✅ Closed (2026-07-18).** Closure Criterion #4 met at 100%; every sub-step (0-8, see below) and all three business decisions are closed. Full narrative account: `reports/phase5b_case_study_signoff_20260718.md`.
+
+### Objective and honest scope
+
+Phase 5 builds a proposal-and-validation framework for retention interventions (copy, timing, channel, incentive) that: generates proposals grounded in real sector literature rather than intuition, runs a statistically rigorous A/B test on them, validates itself blind against 16 synthetic known-ground-truth scenarios (generated by a process isolated from the evaluator, under an opaque naming scheme), and honestly reports "insufficient signal" instead of forcing a winner.
+
+**Can claim:** the framework detects real conversion differences; doesn't manufacture false positives; recognizes when it lacks signal; proposals are literature-grounded.
+**Cannot claim:** that any specific copy performs better with real VivaMarket customers, or that real CLV/churn improve in practice — that requires the real pilot, explicitly out of scope here.
+
+### Subphase map
+
+| Step | Content | Exit gate | Status |
+|:-----|:--------|:----------|:-------|
+| 0 | Environment setup and anti-circularity guardrails | Cleanup PR merged, scenario spec sealed | ✅ Closed |
+| 1 | Research and taxonomy of candidate interventions | Catalog of ≥6-8 interventions, literature-grounded | ✅ Catalog of 8 complete — guardrail-coverage scope decision confirmed (Decision C) |
+| 2 | A/B testing framework engine | Analytically validated engine | ✅ Implemented and validated (53/53 tests) |
+| 3 | Matrix of 16 synthetic scenarios | 16 opaquely-named datasets, sealed ground truth | ✅ Generated and verified |
+| 4 | Blind validation | Complete hit/miss matrix | ✅ Closed — 13/16 correct |
+| 5 | Sensitivity-limit mapping | Limits document, no gloss-over | ✅ Closed — Criterion #4 met at 100% |
+| 6 | Final intervention recommendations | Prioritized recommendations report | ✅ Closed — `reports/phase6_intervention_recommendations_20260718.md` |
+| 7 | Honest README integration | README updated | ✅ Closed |
+| 8 | Case study and sign-off | Published + explicit sign-off | ✅ Closed — `reports/phase5b_case_study_signoff_20260718.md` |
+
+### Blind validation results (Step 4): 13/16 correct
+
+| Outcome | Scenarios | Detail |
+|:--------|:---------:|:-------|
+| ✅ Correct | 13 of 16 | All 8 "obvious"-effect scenarios and 6 of 8 "threshold" scenarios |
+| ❌ Safety false negative | `07_umbral` | Guardrail designed to break marginally — the framework declared a winner anyway |
+| ⚠️ Communication failure | `08_obvio` | n=25, designed to force "insufficient sample" — reported as a confirmed finding instead |
+| ❌ Guardrail false positive | `08_umbral` | n=150, no real guardrail difference — declared "significantly broken" |
+
+All 16 underlying statistical computations were numerically correct (independently re-verified). The failure sits one layer above the math — how the framework communicates a conclusion near the threshold or with a small sample — not in the arithmetic.
+
+### The three business decisions behind the closure
+
+All three were explicitly confirmed by the project author (2026-07-18) after testing multiple alternatives against the real 16-scenario data.
+
+**Decision A — accepted residual (`01_obvio`, `03_umbral`).** A fixed opt-out threshold occasionally fires from pure sampling noise even when the true rate is below it: both scenarios cross the 2.0% threshold on noise (observed 2.11%/2.04% vs. a true 1.5% rate). The adopted fix — the **Power Guardrail** (a Cochran power check runs before the point-estimate trigger; defers to "insufficient sample" if power is inadequate) — correctly resolves the `07_umbral` safety false negative, but not this residual, since both scenarios have adequate power. Seven alternatives were tested (fixed minimum-N, Wilson-CI/non-inferiority, mSPRT, Bayesian); all reopened the safety false negative instead. **Accepted as a permanent, documented limitation, not a pending fix.**
+
+**Decision B — ground-truth integrity (ALCOA+).** The ground-truth file for the 16 scenarios is a reconstruction from documented spec parameters, since the original was not found. A reconstruction cannot, by definition, satisfy ALCOA+'s "Original"/"Contemporaneous" principles — so it's permanently labeled an **accepted reconstruction**, never as "sealed" or "original" data. Optional future improvement: independent verification via deterministic regeneration from the original scripts/seeds (done for 1 of 16 so far).
+
+**Decision C — partial guardrail coverage.** Of the 8 candidate interventions researched, only 3 (`INT-01`, `INT-02`, `INT-04`) have a guardrail measurable with the current opt-out-only framework; the other 5 touch risks the framework can't quantify yet (perceived manipulation, social-proof credibility, cumulative fatigue). **Decision: accept the partial coverage now**, with a **mandatory manual-review gate before any real pilot** of those 5 — the same escalate-to-human pattern the Power Guardrail itself uses when it lacks statistical power.
+
+**Closure criteria (9 total), all met at 100%:** framework implemented and validated against all 16 scenarios · hit/miss results documented with no retroactive adjustment · sensitivity limits explicitly mapped · recommendations delivered (`reports/phase6_intervention_recommendations_20260718.md`) · this README updated · case study published and signed off (`reports/phase5b_case_study_signoff_20260718.md`).
+
+### Phase 5 is closed. What remains is optional and non-blocking
+
+1. **Optional, non-blocking:** explore sequential testing (mSPRT) or a Bayesian approach as future guardrail refinements for the accepted `01_obvio`/`03_umbral` residual.
+2. **Optional, non-blocking:** extend the framework to quantify manipulation perception, social-proof credibility, and cumulative fatigue, so the 5 currently review-gated interventions could eventually get an automated guardrail too (Decision C).
+3. **Next natural step (a new workstream, not a Phase 5 pending item):** run the first real pilot (`INT-02`, personalization) using the Tier 1 test design from `reports/phase6_intervention_recommendations_20260718.md`, once authorized.
 
 ---
 
@@ -606,6 +683,8 @@ Examples from the canonical pipeline artifact run (`20260506`) that the downstre
 - `reports/phase4_population_redesign_benchmark_20260531.html`
 - `reports/model_card_v3_phase4_demo_20260531.md`
 - `reports/vivamarket_churn_business_deck_20260531.pptx
+- `reports/phase6_intervention_recommendations_20260718.md` — Phase 5, step 6: prioritized retention intervention recommendations, economic framework, and first-pilot test design
+- `reports/phase5b_case_study_signoff_20260718.md` — Phase 5, step 8: final publication-oriented case study and explicit, dated project-author sign-off closing the block
 - `reports/archive/` — historical superseded report artifacts kept only for private/local traceability and excluded from the public GitHub package
 - `n8n/n8n_workflow_daily_churn_retention_workflow.json` — main pipeline V9 (Phase 2 executed and validated 2026-05-18; Phase 3B hardening aligned 2026-05-26)
 - `n8n/n8n_workflow_error_handler_workflow.json` — VivaMarket Error Handler (Phase 2, separate error workflow)
@@ -642,13 +721,14 @@ daily-customer-churn-predictor/
 │   │   └── churn_service.py
 │   ├── models/
 │   │   └── churn_scoring.py
-│   └── pipeline/
-│       ├── load_predictions.py
-│       ├── detect_conversions.py
-│       ├── campaign_kpis.py
-│       ├── phase4_bi_dashboard.py
-│       ├── phase4_governance_monitor.py
-│       └── phase4_population_redesign_benchmark.py
+│   ├── pipeline/
+│   │   ├── load_predictions.py
+│   │   ├── detect_conversions.py
+│   │   ├── campaign_kpis.py
+│   │   ├── phase4_bi_dashboard.py
+│   │   ├── phase4_governance_monitor.py
+│   │   ├── phase4_population_redesign_benchmark.py
+│   │   └── ab_testing_framework.py
 ├── n8n/
 │   ├── n8n_workflow_daily_churn_retention_workflow.json
 │   └── n8n_workflow_error_handler_workflow.json
@@ -661,7 +741,9 @@ daily-customer-churn-predictor/
 │   ├── phase4_governance_monitor_latest.html
 │   ├── phase4_population_redesign_benchmark_20260531.html
 │   ├── model_card_v3_phase4_demo_20260531.md
-│   └── vivamarket_churn_business_deck_20260531.pptx
+│   ├── vivamarket_churn_business_deck_20260531.pptx
+│   ├── phase6_intervention_recommendations_20260718.md
+│   └── phase5b_case_study_signoff_20260718.md
 ├── tests/
 ├── assets/
 │   └── images/
@@ -673,6 +755,8 @@ daily-customer-churn-predictor/
 Project rule: public notebook continuity is represented by canonical executed notebook files only. Temporary variants and draft artifacts are not part of the kept publication state.
 
 Operational traceability rule: `STATUS.md` is the working project log. After each material notebook, orchestration, or publication-layer update, refresh `Current state`, `Last completed step`, and `Next pending step` before reporting completion.
+
+Private working scope: the Phase 5 ground-truth file (`ground_truth_frozen.json`), the 16 evaluator-handoff scenario CSVs, and their internal generation/validation scripts live in a private working directory kept out of the public repository package — same exclusion rule already applied to `reports/archive/`. `tests/test_ab_testing_framework.py` (53/53 tests) is part of the versioned test suite, alongside the project's other test modules.
 
 ---
 
@@ -723,6 +807,10 @@ The architecture separates two complementary layers that are not mutually exclus
 
 The production-grade customer-facing automation — oriented to scalable channel delivery, operational governance, and closed-loop measurement — is scoped for a **later hardening phase**, once the underlying churn definition is analytically stable and the business population design decisions have been resolved. In the current repository state, the stronger and more honest framing is: **internal pilot first, production delivery layer later**.
 
+### 5. Blind, self-validating experiment design (Phase 5)
+
+An A/B testing framework that only tests itself is not evidence of anything. Phase 5's validation bench was generated by a process isolated from the evaluator, under an opaque naming scheme — so the framework had to detect real vs. no-effect scenarios blind, rather than the system confirming its own assumptions. See [Phase 5 — Retention Intervention Validation Framework](#phase-5--retention-intervention-validation-framework) for the full results and the decisions behind its closure.
+
 ---
 
 ## Known Limitations
@@ -735,6 +823,11 @@ The production-grade customer-facing automation — oriented to scalable channel
 6. The current ROI layer is scenario-based and useful for stakeholder discussion, but it is not causal or experimentally validated.
 7. The feedback loop is implemented only at portfolio/demo level: synthetic event capture, synthetic conversion attribution, and synthetic campaign-performance measurement exist, but live observed customer response telemetry is still outside scope.
 8. Explainability artifact lineage for the later 20260519 state should still be documented more explicitly so the canonical post-Phase-3B handoff is unambiguous.
+9. The Phase 5 A/B testing guardrail has a permanently accepted residual: two scenarios (`01_obvio`, `03_umbral`) will continue to be flagged as "guardrail broken" even though, on the observed data, they are false positives caused by sampling noise near the opt-out threshold. No tested alternative (fixed minimum-N, Wilson-CI/non-inferiority, calibrated non-inferiority) removes this residual without reopening the original `07_umbral` safety false negative; only a future move to sequential testing (mSPRT) or a Bayesian approach would address it structurally.
+10. The Phase 5 ground-truth file (`ground_truth_frozen.json`) is an accepted **reconstruction**, not an original capture — it does not satisfy the ALCOA+ "Original" or "Contemporaneous" principles by definition, and is permanently labeled as such rather than as "sealed" or "original" data.
+11. Of the 8 candidate retention interventions researched in Phase 5, only 3 (`INT-01`, `INT-02`, `INT-04`) have a guardrail that is quantitatively measurable with the current opt-out-only framework; the other 5 touch real risks (perceived manipulation, social-proof credibility, communication fatigue) that the system cannot yet quantify. This partial coverage is accepted (Decision C), with a mandatory manual-review gate before any real pilot of those 5, rather than blocking on a framework extension.
+12. Step 6's prioritized recommendations (`reports/phase6_intervention_recommendations_20260718.md`) rank interventions by evidence strength, guardrail risk, and economic upside using Phase 4's real margin/cost figures — but none of the 8 interventions has been run against real VivaMarket customers yet; all effect-size figures cited come from third-party literature, not from a completed pilot of these specific interventions.
+13. Phase 5 is now closed end-to-end, including the final signed-off case study (step 8). What remains open is a separate workstream, not a Phase 5 pending item: running the first real pilot (`INT-02`) authorized by the step-6 recommendations report.
 
 ---
 
@@ -758,6 +851,13 @@ The production-grade customer-facing automation — oriented to scalable channel
 11. **Model Card upgrade from scenario-based to evidence-enriched**
 12. **Stronger artifact lineage and post-release technical governance**
 
+### Phase 5 follow-on upgrades (post sign-off)
+
+13. **Sequential testing (mSPRT)** — re-evaluate the guardrail as more data accumulates without degrading guarantees from repeated looks; the only structural fix for the accepted `01_obvio`/`03_umbral` residual.
+14. **Bayesian A/B reporting** — report "probability that the true rate exceeds the threshold" instead of a binary verdict, at the cost of introducing a prior and changing the output contract.
+15. **Extend guardrail coverage (optional, non-blocking)** — quantify manipulation perception, social-proof credibility, and cumulative communication fatigue, so the 5 currently review-gated interventions (`INT-03`, `INT-05`, `INT-06`, `INT-07`, `INT-08`) could eventually get an automated guardrail too, on top of the mandatory manual review already required for them (Decision C).
+16. **Live business-facing reporting system** — evolve the static Step 6 recommendations report into a system that updates with live data, once the underlying report has proven the catalog + margin/cost model produce something useful.
+
 ### Strategic sequencing recommendation
 
 1. Preserve explicit comparability between the historical **v1.0.0** baseline, the **canonical V2C** redesign, and the current **Phase 4 demo baseline**.
@@ -778,12 +878,16 @@ The production-grade customer-facing automation — oriented to scalable channel
 6. Implement structured cohort analysis.
 7. Add uplift / incremental-response modeling.
 8. Re-run the downstream notebook chain only if the analytical base changes materially.
+9. **Run the first real pilot:** execute the Tier 1 test design from the Step 6 recommendations report (starting with `INT-02`, personalization) once authorized — this is the natural bridge from validated-on-synthetic-data to validated-on-real-customers, and the first item of a new, separate workstream rather than a Phase 5 pending item.
+10. **Optional, non-blocking:** explore sequential testing (mSPRT) or a Bayesian approach as future guardrail refinements for the accepted `01_obvio`/`03_umbral` residual.
+11. **Optional, non-blocking:** extend the framework to quantify manipulation perception, social-proof credibility, and cumulative fatigue, replacing the manual-review gate for `INT-03`, `INT-05`, `INT-06`, `INT-07`, `INT-08` with an automated one (Decision C).
+12. **Define real-pilot criteria:** specify what synthetic-validation signals (hit rate, mapped sensitivity limits) need to hold before authorizing a small-scale real pilot with actual VivaMarket customers.
 
 ---
 
 ## Version Note
 
-This README documents the **current `v4.0.0-phase4-demo` portfolio baseline** built on top of the synchronized canonical V2C artifact line. The earlier GitHub publication corresponded to the historical **v1.0.0 baseline**. The current local state should therefore be read as: historical public `v1.0.0` baseline → canonical V2C analytical redesign → Phase 2 orchestration validation → Phase 3B publication hardening → Phase 4 simulated measurement / governance / benchmark closure. Any future public release should preserve that comparability chain explicitly instead of flattening it into a single-version story.
+This README documents the **current `v4.0.0-phase4-demo` portfolio baseline** built on top of the synchronized canonical V2C artifact line, now extended with the **Phase 5 A/B testing validation framework, closed end-to-end on 2026-07-18**. The earlier GitHub publication corresponded to the historical **v1.0.0 baseline**. The current local state should therefore be read as: historical public `v1.0.0` baseline → canonical V2C analytical redesign → Phase 2 orchestration validation → Phase 3B publication hardening → Phase 4 simulated measurement / governance / benchmark closure → Phase 5 A/B testing validation framework, closed (Closure Criterion #4 met at 100%; all sub-steps closed, case study signed off). Any future public release should preserve that comparability chain explicitly instead of flattening it into a single-version story.
 
 ---
 
@@ -802,10 +906,10 @@ If you reuse ideas or workflow patterns from this repository, attribution is app
 
 ---
 
-**Last Updated:** May 31, 2026  
-**Canonical artifact line:** 20260506 · n8n V9 · Phase 4 demo closure  
-**Status:** NB01–NB09 Complete · Phase 2 Complete · n8n V9 Executed (two-workflow architecture) · Phase 3B Operational Baseline Closed · Publication Layer Synchronized · v1.0.0 Baseline Published · Canonical V2C Artifact Line Active · Phase 4 Closed at Portfolio/Demo Benchmark Level
+**Last Updated:** July 18, 2026  
+**Canonical artifact line:** 20260506 · n8n V9 · Phase 4 demo closure · Phase 5 validation framework (closed 2026-07-18)  
+**Status:** NB01–NB09 Complete · Phase 2 Complete · n8n V9 Executed (two-workflow architecture) · Phase 3B Operational Baseline Closed · Publication Layer Synchronized · v1.0.0 Baseline Published · Canonical V2C Artifact Line Active · Phase 4 Closed at Portfolio/Demo Benchmark Level · Phase 5 Closed End-to-End (Closure Criterion #4 Met at 100% · Recommendations Delivered · Guardrail-Coverage Scope Decision Confirmed · Case Study Published and Signed Off 2026-07-18)
 
 ---
 
-*This README serves both as technical documentation and as a publication-oriented narrative of the project's analytical evolution from the published v1 baseline through the synchronized canonical V2C artifact line, Phase 2 operational validation, and the current internal-pilot-first publication framing.*
+*This README serves both as technical documentation and as a publication-oriented narrative of the project's analytical evolution from the published v1 baseline through the synchronized canonical V2C artifact line, Phase 2 operational validation, Phase 4 measurement/governance closure, and the current Phase 5 A/B testing validation framework.*
