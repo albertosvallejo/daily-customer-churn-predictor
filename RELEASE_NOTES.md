@@ -1,5 +1,53 @@
 # RELEASE NOTES
 
+## Phase 6 — Dynamic Evidence System — 2026-07-24
+
+### Summary
+
+This entry closes **Phase 6** at documentary/project scope: a move from a single static intervention-recommendation document (Phase 5B) to a reproducible evidence-refresh system — versioned evidence catalog snapshots, recommendation reprioritization, approval-ready proposals, append-only decision history, a simulated A/B launch flow reusing the real Phase 5 framework, and a dated KPI-status surface. Like Phase 5, this is documented as a dated closure note rather than a version bump, since it does not modify the canonical V2C scoring pipeline, the API, or the n8n orchestration layer.
+
+The purpose is operational and documentary, not causal. This closure does not claim that any specific intervention has already improved churn or customer value against real VivaMarket customers.
+
+### What was delivered
+
+- Formal spec and governed source baseline for the dynamic evidence system (`docs/phase6_spec_dynamic_evidence_system.md`).
+- Immutable evidence catalog snapshots with dated outputs (`data/processed/evidence_catalog_20260721.json`, `..._20260724.json`, `..._20260725.json`; summarized in `reports/phase6_evidence_catalog_summary_*.md`).
+- Recommendation reprioritization from the latest available catalog snapshot (`reports/phase6_dynamic_evidence_recommendations_20260721/24/25.md`).
+- Approval proposal generation for eligible interventions (`data/processed/phase6_action_proposals_20260724/25.json`, summarized in `reports/phase6_action_proposals_summary_20260724/25.md`).
+- Append-only action-history logging (`data/processed/action_history_log.parquet`).
+- Simulated A/B launch flow reusing the real Phase 5 framework (`scripts/launch_phase6_ab_test.py`, `data/processed/phase6_ab_test_runs.parquet`).
+- Dated KPI-status reporting per run (`data/processed/phase6_kpi_status_20260724.json`, `reports/phase6_kpi_status_20260724.md`).
+- n8n-ready payload generation for orchestration handoff (`scripts/build_phase6_n8n_payload.py`, `data/processed/phase6_n8n_payload_20260725.json`).
+- Documentary closure in the README (`Phase 6 — Dynamic Evidence System` section) and dated sign-off (`reports/phase6_case_study_signoff_20260724.md`).
+
+### Historical naming correction applied at closure
+
+The artifact previously named `reports/phase6_intervention_recommendations_20260718.md` was clarified and renamed to `reports/phase5_step6_intervention_recommendations_20260718.md`. This was a nomenclature fix only — the content remains the Phase 5 step-6 recommendations deliverable and is not reinterpreted as a new Phase 6 output.
+
+### Key decisions behind the closure
+
+- **Scope boundary:** Phase 6 materially mitigates the earlier limitation where intervention prioritization lived only in a fixed historical report, by connecting approvals, action history, simulated launch, and KPI-status reporting end-to-end at project level. It does not claim the evidence layer is live, autonomous, or fed by production experimentation, and does not claim the simulated A/B launch path is equivalent to a completed real pilot.
+- **Accepted limitation carried forward:** the pre-restoration behavior of `phase5_shadow_monitor.py` and `phase5_daily_status.py`, prior to the baseline used during the 6.4 audit, is not verifiable — no clean pre-edit evidence exists. The current restored state is accepted as the new operational baseline, without a claim of strict equivalence to the unknown pre-restoration state.
+
+### Validation evidence
+
+- `python3 -m unittest tests.test_phase6_catalog_builder tests.test_evidence_sourcing tests.test_phase6_integration -v` → `[fill in latest local pass/fail count before publishing]`
+- Sub-phases 6.1 to 6.5 completed at documentary/project scope; README closure completed; historical naming collision resolved; dated sign-off artifact published.
+- **Note:** unlike the Phase 5 entry above (independently re-verified in this project's own review process), the Phase 6 test-suite results have not been independently re-executed as part of that same review — confirm the current pass count locally before treating this line as verified.
+
+### Known boundaries in this release
+
+- No intervention has been validated on real VivaMarket customers through this system.
+- The evidence layer is not live, autonomous, or fed by production experimentation.
+- The simulated A/B launch path is not equivalent to a completed real pilot.
+- This entry does not supersede or modify the `v4.0.0-phase4-demo` scoring/production baseline, nor the Phase 5 validation framework below.
+
+### Recommended next step after this closure
+
+Run the first real pilot (`INT-02`, personalization) per the Tier 1 test design in `reports/phase5_step6_intervention_recommendations_20260718.md`, once authorized, and feed its real result back through the Phase 6 evidence catalog on the next dated snapshot — a new workstream, not a Phase 6 pending item.
+
+---
+
 ## Phase 5 — Retention Intervention Validation Framework — 2026-07-18
 
 ### Summary
@@ -14,7 +62,7 @@ Phase 5 generates intervention proposals grounded in real sector literature, run
 - **16 synthetic ground-truth scenarios**, opaquely named, sealed ground truth.
 - **Blind validation (Step 4): 13/16 correct** — all 8 "obvious"-effect scenarios and 6 of 8 "threshold" scenarios. All 16 underlying statistical computations were independently re-verified as numerically correct; the 3 misses were communication-layer failures (declaring a verdict near a threshold or on an underpowered sample), not arithmetic errors.
 - **Sensitivity-limit mapping**, closed with Closure Criterion #4 met at 100%.
-- **Final intervention recommendations**: `reports/phase6_intervention_recommendations_20260718.md`.
+- **Final intervention recommendations**: `reports/phase5_step6_intervention_recommendations_20260718.md`.
 - **Case study and sign-off**: `reports/phase5b_case_study_signoff_20260718.md`, explicitly confirmed by the project author on 2026-07-18.
 
 ### Key decisions behind the closure
@@ -38,7 +86,7 @@ Phase 5 generates intervention proposals grounded in real sector literature, run
 
 ### Recommended next step after this closure
 
-Run the first real pilot (`INT-02`, personalization) using the Tier 1 test design from `reports/phase6_intervention_recommendations_20260718.md`, once authorized — a new workstream, not a Phase 5 pending item.
+Run the first real pilot (`INT-02`, personalization) using the Tier 1 test design from `reports/phase5_step6_intervention_recommendations_20260718.md`, once authorized — a new workstream, not a Phase 5 pending item.
 
 ---
 

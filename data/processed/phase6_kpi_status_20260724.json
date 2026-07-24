@@ -1,0 +1,46 @@
+{
+  "status": "ok",
+  "generated_at": "2026-07-24T10:57:36Z",
+  "deployment_mode": "simulated",
+  "test_count": 2,
+  "records": [
+    {
+      "ab_test_run_id": "ab-20260725-fb48ee2d",
+      "proposal_id": "p6-20260725-0d04b226",
+      "intervention_id": "INT-02",
+      "status": "completed",
+      "deployment_mode": "simulated",
+      "primary_kpi": "conversion_rate",
+      "guardrail_kpi": "opt_out_rate",
+      "control_conversion_rate": 0.09,
+      "variant_conversion_rate": 0.12,
+      "conversion_lift": 0.03,
+      "control_opt_out_rate": 0.011667,
+      "variant_opt_out_rate": 0.015,
+      "verdict": "B_wins",
+      "guardrail_breach": false,
+      "p_value": 0.016524277663507725,
+      "power_achieved": 0.6691928474332731,
+      "launch_ts": "2026-07-24T10:57:36Z"
+    },
+    {
+      "ab_test_run_id": "ab-20260725-71a5af62",
+      "proposal_id": "p6-20260725-eec16c63",
+      "intervention_id": "INT-02",
+      "status": "completed",
+      "deployment_mode": "simulated",
+      "primary_kpi": "conversion_rate",
+      "guardrail_kpi": "opt_out_rate",
+      "control_conversion_rate": 0.09,
+      "variant_conversion_rate": 0.12,
+      "conversion_lift": 0.03,
+      "control_opt_out_rate": 0.011667,
+      "variant_opt_out_rate": 0.015,
+      "verdict": "B_wins",
+      "guardrail_breach": false,
+      "p_value": 0.016524277663507725,
+      "power_achieved": 0.6691928474332731,
+      "launch_ts": "2026-07-24T10:57:10Z"
+    }
+  ]
+}

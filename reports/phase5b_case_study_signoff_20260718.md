@@ -57,7 +57,7 @@ All three decisions were confirmed by the project author on 2026-07-18, dated an
 
 ## From validated method to a ready pilot
 
-With the statistical framework validated and its limits mapped rather than glossed over, the intervention catalog was translated into a prioritized recommendations report (`reports/phase6_intervention_recommendations_20260718.md`): which interventions to test first, the economic framework behind the prioritization, and a ready-to-execute Tier 1 test design — starting with `INT-02` (personalization) — for the first real pilot with actual customers, once authorized.
+With the statistical framework validated and its limits mapped rather than glossed over, the intervention catalog was translated into a prioritized recommendations report (`reports/phase5_step6_intervention_recommendations_20260718.md`): which interventions to test first, the economic framework behind the prioritization, and a ready-to-execute Tier 1 test design — starting with `INT-02` (personalization) — for the first real pilot with actual customers, once authorized.
 
 ## What this phase can honestly claim, and what it can't
 
@@ -84,7 +84,7 @@ Keeping that boundary explicit — rather than letting a strong validation resul
 
 **Approved by:** Alberto Sánchez, Project Author
 **Date:** 2026-07-18
-**Statement:** I confirm that I have reviewed this case study and the underlying Phase 5B artifacts (blind validation results, Power Guardrail implementation and test suite, Decisions A/B/C, and the Phase 6 recommendations report), and I approve Phase 5B as closed on the terms documented above, including its accepted limitations.
+**Statement:** I confirm that I have reviewed this case study and the underlying Phase 5B artifacts (blind validation results, Power Guardrail implementation and test suite, Decisions A/B/C, and the Phase 5 step-6 recommendations report), and I approve Phase 5B as closed on the terms documented above, including its accepted limitations.
 
 *This sign-off follows the same ALCOA+ attribution standard (Attributable, Legible, Contemporaneous, Original, Accurate) applied to Decisions A, B, and C earlier in this phase.*
 

@@ -34,6 +34,7 @@ Phase 4 is presented with the correct evidence boundary: the repository includes
 | Current portfolio baseline | `v4.0.0-phase4-demo` | Adds measurement, governance, benchmark reasoning, and publication hardening |
 | Measurement scope | Portfolio evaluation baseline | Measurement and governance are implemented; live customer-response evidence is intentionally out of scope |
 | Phase 5 (A/B testing framework) | ✅ Closed — case study published, sign-off obtained (2026-07-18) | Statistical framework built, blind-validated (13/16), and hardened (53/53 tests); guardrail-coverage scope decision confirmed; case study at `reports/phase5b_case_study_signoff_20260718.md` |
+| Phase 6 (dynamic evidence system) | ✅ Closed — documentary closure, historical rename, sign-off obtained (2026-07-24) | Dynamic evidence catalog, recommendation reprioritization, approval/action-history chain, simulated A/B launch, KPI status surface, and dated closure artifacts are now documented end-to-end; real-customer evidence remains intentionally out of scope |
 
 ### Canonical V2C artifact line — key metrics and decisions
 
@@ -95,8 +96,9 @@ The correct public interpretation is therefore precise: the project has **credib
 | `reports/phase4_governance_monitor_latest.html` | Drift monitoring and model governance surface |
 | `reports/phase4_population_redesign_benchmark_20260531.html` | Retainable-vs-structural population benchmark and decision artifact |
 | `reports/phase4_bi_dashboard_demo.html` | Stakeholder-facing KPI/BI dashboard |
-| `reports/phase6_intervention_recommendations_20260718.md` | Prioritized retention intervention recommendations and first-pilot test design (Phase 5) |
+| `reports/phase5_step6_intervention_recommendations_20260718.md` | Prioritized retention intervention recommendations and first-pilot test design (Phase 5) |
 | `reports/phase5b_case_study_signoff_20260718.md` | Full narrative case study and sign-off for the Phase 5 A/B testing validation framework |
+| `reports/phase6_case_study_signoff_20260724.md` | Closure note and explicit sign-off for the Phase 6 dynamic evidence system |
 
 > **Public data note:** the raw SQLite source is public and downloadable from Kaggle, but excluded from versioned scope because of size.
 
@@ -541,7 +543,7 @@ Phase 5 builds a proposal-and-validation framework for retention interventions (
 | 3 | Matrix of 16 synthetic scenarios | 16 opaquely-named datasets, sealed ground truth | ✅ Generated and verified |
 | 4 | Blind validation | Complete hit/miss matrix | ✅ Closed — 13/16 correct |
 | 5 | Sensitivity-limit mapping | Limits document, no gloss-over | ✅ Closed — Criterion #4 met at 100% |
-| 6 | Final intervention recommendations | Prioritized recommendations report | ✅ Closed — `reports/phase6_intervention_recommendations_20260718.md` |
+| 6 | Final intervention recommendations | Prioritized recommendations report | ✅ Closed — `reports/phase5_step6_intervention_recommendations_20260718.md` |
 | 7 | Honest README integration | README updated | ✅ Closed |
 | 8 | Case study and sign-off | Published + explicit sign-off | ✅ Closed — `reports/phase5b_case_study_signoff_20260718.md` |
 
@@ -566,13 +568,42 @@ All three were explicitly confirmed by the project author (2026-07-18) after tes
 
 **Decision C — partial guardrail coverage.** Of the 8 candidate interventions researched, only 3 (`INT-01`, `INT-02`, `INT-04`) have a guardrail measurable with the current opt-out-only framework; the other 5 touch risks the framework can't quantify yet (perceived manipulation, social-proof credibility, cumulative fatigue). **Decision: accept the partial coverage now**, with a **mandatory manual-review gate before any real pilot** of those 5 — the same escalate-to-human pattern the Power Guardrail itself uses when it lacks statistical power.
 
-**Closure criteria (9 total), all met at 100%:** framework implemented and validated against all 16 scenarios · hit/miss results documented with no retroactive adjustment · sensitivity limits explicitly mapped · recommendations delivered (`reports/phase6_intervention_recommendations_20260718.md`) · this README updated · case study published and signed off (`reports/phase5b_case_study_signoff_20260718.md`).
+**Closure criteria (9 total), all met at 100%:** framework implemented and validated against all 16 scenarios · hit/miss results documented with no retroactive adjustment · sensitivity limits explicitly mapped · recommendations delivered (`reports/phase5_step6_intervention_recommendations_20260718.md`) · this README updated · case study published and signed off (`reports/phase5b_case_study_signoff_20260718.md`).
 
 ### Phase 5 is closed. What remains is optional and non-blocking
 
 1. **Optional, non-blocking:** explore sequential testing (mSPRT) or a Bayesian approach as future guardrail refinements for the accepted `01_obvio`/`03_umbral` residual.
 2. **Optional, non-blocking:** extend the framework to quantify manipulation perception, social-proof credibility, and cumulative fatigue, so the 5 currently review-gated interventions could eventually get an automated guardrail too (Decision C).
-3. **Next natural step (a new workstream, not a Phase 5 pending item):** run the first real pilot (`INT-02`, personalization) using the Tier 1 test design from `reports/phase6_intervention_recommendations_20260718.md`, once authorized.
+3. **Next natural step (a new workstream, not a Phase 5 pending item):** run the first real pilot (`INT-02`, personalization) using the Tier 1 test design from `reports/phase5_step6_intervention_recommendations_20260718.md`, once authorized.
+
+---
+
+## Phase 6 — Dynamic Evidence System
+
+**Status: ✅ Closed (2026-07-24).** The project now has a dated, reproducible evidence-refresh layer that extends the Phase 5 intervention framework without pretending to be a real-customer pilot.
+
+### Objective and honest scope
+
+Phase 6 adds a documentary and operational layer on top of the closed Phase 5 framework: curate a governed evidence catalog, re-prioritize interventions from dated evidence snapshots, expose approval-ready proposals, preserve append-only decision history, and launch simulated A/B tests through the same statistical framework already validated in Phase 5.
+
+**Can claim:** the project now has a dynamic, versioned evidence-to-proposal chain with simulated launch and KPI-status surfaces.
+**Cannot claim:** that any intervention has already produced a verified uplift on real VivaMarket customers — Phase 6 closes with simulated execution and documentary evidence only.
+
+### What Phase 6 delivered
+
+| Sub-phase | Delivery | Status |
+|:----------|:---------|:-------|
+| 6.1 | Spec + governed source baseline + immutable evidence catalog builder | ✅ Closed |
+| 6.2 | Recommendation reprioritization from dated catalog snapshots | ✅ Closed |
+| 6.3 | Automated validation + manual validation checklist | ✅ Closed |
+| 6.4 | Approval proposals, append-only action history, simulated A/B launch, KPI status view, n8n-ready payload | ✅ Closed |
+| 6.5 | README closure, historical artifact rename, dated sign-off | ✅ Closed |
+
+### Closure notes
+
+- The historically ambiguous file `reports/phase6_intervention_recommendations_20260718.md` has been renamed to `reports/phase5_step6_intervention_recommendations_20260718.md` because it belongs to **Phase 5, step 6**, not to this new Phase 6 workstream.
+- The current dynamic evidence system improves the old static recommendation layer materially, but it does **not** convert the project into a live evidence engine: external evidence remains curated, refreshes are dated, launches are simulated by design, and real-customer business impact is still outside the validated scope.
+- The accepted Phase 6 closure artifact is `reports/phase6_case_study_signoff_20260724.md`.
 
 ---
 
@@ -683,7 +714,7 @@ Examples from the canonical pipeline artifact run (`20260506`) that the downstre
 - `reports/phase4_population_redesign_benchmark_20260531.html`
 - `reports/model_card_v3_phase4_demo_20260531.md`
 - `reports/vivamarket_churn_business_deck_20260531.pptx
-- `reports/phase6_intervention_recommendations_20260718.md` — Phase 5, step 6: prioritized retention intervention recommendations, economic framework, and first-pilot test design
+- `reports/phase5_step6_intervention_recommendations_20260718.md` — Phase 5, step 6: prioritized retention intervention recommendations, economic framework, and first-pilot test design
 - `reports/phase5b_case_study_signoff_20260718.md` — Phase 5, step 8: final publication-oriented case study and explicit, dated project-author sign-off closing the block
 - `reports/archive/` — historical superseded report artifacts kept only for private/local traceability and excluded from the public GitHub package
 - `n8n/n8n_workflow_daily_churn_retention_workflow.json` — main pipeline V9 (Phase 2 executed and validated 2026-05-18; Phase 3B hardening aligned 2026-05-26)
@@ -742,8 +773,9 @@ daily-customer-churn-predictor/
 │   ├── phase4_population_redesign_benchmark_20260531.html
 │   ├── model_card_v3_phase4_demo_20260531.md
 │   ├── vivamarket_churn_business_deck_20260531.pptx
-│   ├── phase6_intervention_recommendations_20260718.md
-│   └── phase5b_case_study_signoff_20260718.md
+│   ├── phase5_step6_intervention_recommendations_20260718.md
+│   ├── phase5b_case_study_signoff_20260718.md
+│   └── phase6_case_study_signoff_20260724.md
 ├── tests/
 ├── assets/
 │   └── images/
@@ -826,8 +858,8 @@ An A/B testing framework that only tests itself is not evidence of anything. Pha
 9. The Phase 5 A/B testing guardrail has a permanently accepted residual: two scenarios (`01_obvio`, `03_umbral`) will continue to be flagged as "guardrail broken" even though, on the observed data, they are false positives caused by sampling noise near the opt-out threshold. No tested alternative (fixed minimum-N, Wilson-CI/non-inferiority, calibrated non-inferiority) removes this residual without reopening the original `07_umbral` safety false negative; only a future move to sequential testing (mSPRT) or a Bayesian approach would address it structurally.
 10. The Phase 5 ground-truth file (`ground_truth_frozen.json`) is an accepted **reconstruction**, not an original capture — it does not satisfy the ALCOA+ "Original" or "Contemporaneous" principles by definition, and is permanently labeled as such rather than as "sealed" or "original" data.
 11. Of the 8 candidate retention interventions researched in Phase 5, only 3 (`INT-01`, `INT-02`, `INT-04`) have a guardrail that is quantitatively measurable with the current opt-out-only framework; the other 5 touch real risks (perceived manipulation, social-proof credibility, communication fatigue) that the system cannot yet quantify. This partial coverage is accepted (Decision C), with a mandatory manual-review gate before any real pilot of those 5, rather than blocking on a framework extension.
-12. Step 6's prioritized recommendations (`reports/phase6_intervention_recommendations_20260718.md`) rank interventions by evidence strength, guardrail risk, and economic upside using Phase 4's real margin/cost figures — but none of the 8 interventions has been run against real VivaMarket customers yet; all effect-size figures cited come from third-party literature, not from a completed pilot of these specific interventions.
-13. Phase 5 is now closed end-to-end, including the final signed-off case study (step 8). What remains open is a separate workstream, not a Phase 5 pending item: running the first real pilot (`INT-02`) authorized by the step-6 recommendations report.
+12. Phase 6 mitigates — but does not resolve — the prior documentary gap around static intervention recommendations: the project now maintains a dynamic evidence catalog, a dated reprioritization report, approval logging, simulated A/B launch orchestration, KPI status reporting, and append-only action history. However, none of the 8 interventions has been run against real VivaMarket customers yet; effect-size figures still come from third-party literature and simulated execution paths rather than from a completed real pilot.
+13. Phase 5 is now closed end-to-end, including the final signed-off case study (step 8). The historical step-6 recommendations artifact remains valid under its corrected name `reports/phase5_step6_intervention_recommendations_20260718.md`.
 
 ---
 
@@ -887,7 +919,7 @@ An A/B testing framework that only tests itself is not evidence of anything. Pha
 
 ## Version Note
 
-This README documents the **current `v4.0.0-phase4-demo` portfolio baseline** built on top of the synchronized canonical V2C artifact line, now extended with the **Phase 5 A/B testing validation framework, closed end-to-end on 2026-07-18**. The earlier GitHub publication corresponded to the historical **v1.0.0 baseline**. The current local state should therefore be read as: historical public `v1.0.0` baseline → canonical V2C analytical redesign → Phase 2 orchestration validation → Phase 3B publication hardening → Phase 4 simulated measurement / governance / benchmark closure → Phase 5 A/B testing validation framework, closed (Closure Criterion #4 met at 100%; all sub-steps closed, case study signed off). Any future public release should preserve that comparability chain explicitly instead of flattening it into a single-version story.
+This README documents the **current `v4.0.0-phase4-demo` portfolio baseline** built on top of the synchronized canonical V2C artifact line, now extended with the **Phase 5 A/B testing validation framework, closed end-to-end on 2026-07-18**, and further extended with the **Phase 6 dynamic evidence system, closed on 2026-07-24**. The earlier GitHub publication corresponded to the historical **v1.0.0 baseline**. The current local state should therefore be read as: historical public `v1.0.0` baseline → canonical V2C analytical redesign → Phase 2 orchestration validation → Phase 3B publication hardening → Phase 4 simulated measurement / governance / benchmark closure → Phase 5 A/B testing validation framework, closed (Closure Criterion #4 met at 100%; all sub-steps closed, case study signed off) → Phase 6 dynamic evidence system, closed (sub-phases 6.1–6.5 closed at documentary/project scope; historical artifact naming collision resolved; dated sign-off published). Any future public release should preserve that comparability chain explicitly instead of flattening it into a single-version story.
 
 ---
 
@@ -906,10 +938,10 @@ If you reuse ideas or workflow patterns from this repository, attribution is app
 
 ---
 
-**Last Updated:** July 18, 2026  
-**Canonical artifact line:** 20260506 · n8n V9 · Phase 4 demo closure · Phase 5 validation framework (closed 2026-07-18)  
-**Status:** NB01–NB09 Complete · Phase 2 Complete · n8n V9 Executed (two-workflow architecture) · Phase 3B Operational Baseline Closed · Publication Layer Synchronized · v1.0.0 Baseline Published · Canonical V2C Artifact Line Active · Phase 4 Closed at Portfolio/Demo Benchmark Level · Phase 5 Closed End-to-End (Closure Criterion #4 Met at 100% · Recommendations Delivered · Guardrail-Coverage Scope Decision Confirmed · Case Study Published and Signed Off 2026-07-18)
+**Last Updated:** July 24, 2026  
+**Canonical artifact line:** 20260506 · n8n V9 · Phase 4 demo closure · Phase 5 validation framework (closed 2026-07-18) · Phase 6 dynamic evidence system (closed 2026-07-24)  
+**Status:** NB01–NB09 Complete · Phase 2 Complete · n8n V9 Executed (two-workflow architecture) · Phase 3B Operational Baseline Closed · Publication Layer Synchronized · v1.0.0 Baseline Published · Canonical V2C Artifact Line Active · Phase 4 Closed at Portfolio/Demo Benchmark Level · Phase 5 Closed End-to-End (Closure Criterion #4 Met at 100% · Recommendations Delivered · Guardrail-Coverage Scope Decision Confirmed · Case Study Published and Signed Off 2026-07-18) · Phase 6 Closed at Documentary/Project Scope (Sub-phases 6.1–6.5 Closed · Historical Naming Collision Resolved · Case Study Published and Signed Off 2026-07-24 · Real-Customer Validation Explicitly Out of Scope)
 
 ---
 
-*This README serves both as technical documentation and as a publication-oriented narrative of the project's analytical evolution from the published v1 baseline through the synchronized canonical V2C artifact line, Phase 2 operational validation, Phase 4 measurement/governance closure, and the current Phase 5 A/B testing validation framework.*
+*This README serves both as technical documentation and as a publication-oriented narrative of the project's analytical evolution from the published v1 baseline through the synchronized canonical V2C artifact line, Phase 2 operational validation, Phase 4 measurement/governance closure, the Phase 5 A/B testing validation framework, and the current Phase 6 dynamic evidence system.*

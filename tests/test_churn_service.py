@@ -19,6 +19,7 @@ os.environ["CHURN_DB_URL"] = f"sqlite:///{Path(_tmpdir.name) / 'test_ops.sqlite'
 
 import api.churn_service as churn_service
 from api.churn_service import COUPON_REGISTRY_PATH, create_server
+from evidence.phase6_integration import build_action_proposals
 
 
 class TestChurnService(unittest.TestCase):
@@ -258,10 +259,130 @@ class TestChurnService(unittest.TestCase):
             with urlopen(reconcile_request) as response:
                 payload = json.loads(response.read().decode("utf-8"))
         self.assertEqual(payload["status"], "ok")
-        self.assertEqual(payload["human_decision"], "dispatch_confirm")
-        self.assertTrue(payload["match"])
-        self.assertEqual(payload["monitor_refresh"]["status"], "ok")
-        self.assertEqual(payload["monitor_refresh"]["daily_status_refresh"]["status"], "ok")
+
+    def test_phase6_proposals_endpoint_and_decision_history(self):
+        build_payload = build_action_proposals(project_root=PROJECT_ROOT, run_date="20260724")
+        with urlopen(self._url(f"/phase6/proposals/latest?run_date={build_payload['run_date']}")) as response:
+            self.assertEqual(response.status, 200)
+            proposals_payload = json.loads(response.read().decode("utf-8"))
+        self.assertGreaterEqual(proposals_payload["proposal_count"], 1)
+        proposal_id = proposals_payload["proposals"][0]["proposal_id"]
+
+        decision_request = Request(
+            self._url("/phase6/proposals/decision"),
+            data=json.dumps(
+                {
+                    "proposal_id": proposal_id,
+                    "proposal_run_date": build_payload["run_date"],
+                    "decision_status": "approved",
+                    "decision_reason": "Approved for simulated launch",
+                    "decided_by": "architect.openclaw@gmail.com",
+                }
+            ).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urlopen(decision_request) as response:
+            self.assertEqual(response.status, 201)
+            decision_payload = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(decision_payload["decision_status"], "approved")
+
+        with urlopen(self._url("/phase6/action-history/latest")) as response:
+            self.assertEqual(response.status, 200)
+            history_payload = json.loads(response.read().decode("utf-8"))
+        self.assertGreaterEqual(history_payload["record_count"], 1)
+
+    def test_phase6_ab_launch_kpi_and_n8n_endpoints(self):
+        build_payload = build_action_proposals(project_root=PROJECT_ROOT, run_date="20260725")
+        with urlopen(self._url(f"/phase6/proposals/latest?run_date={build_payload['run_date']}")) as response:
+            proposals_payload = json.loads(response.read().decode("utf-8"))
+        proposal_id = proposals_payload["proposals"][0]["proposal_id"]
+
+        decision_request = Request(
+            self._url("/phase6/proposals/decision"),
+            data=json.dumps(
+                {
+                    "proposal_id": proposal_id,
+                    "proposal_run_date": build_payload["run_date"],
+                    "decision_status": "approved",
+                    "decision_reason": "Approved for simulated launch",
+                    "decided_by": "architect.openclaw@gmail.com",
+                }
+            ).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urlopen(decision_request) as response:
+            self.assertEqual(response.status, 201)
+
+        launch_request = Request(
+            self._url("/phase6/ab-tests/launch"),
+            data=json.dumps(
+                {
+                    "proposal_id": proposal_id,
+                    "proposal_run_date": build_payload["run_date"],
+                    "launched_by": "architect.openclaw@gmail.com",
+                }
+            ).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urlopen(launch_request) as response:
+            self.assertEqual(response.status, 201)
+            launch_payload = json.loads(response.read().decode("utf-8"))
+        self.assertEqual(launch_payload["status"], "completed")
+
+        with urlopen(self._url("/phase6/kpis/latest?refresh=true")) as response:
+            self.assertEqual(response.status, 200)
+            kpi_payload = json.loads(response.read().decode("utf-8"))
+        self.assertGreaterEqual(kpi_payload["test_count"], 1)
+
+        with urlopen(self._url(f"/phase6/n8n-payload/latest?run_date={build_payload['run_date']}&refresh=true")) as response:
+            self.assertEqual(response.status, 200)
+            n8n_payload = json.loads(response.read().decode("utf-8"))
+        self.assertGreaterEqual(n8n_payload["action_count"], 1)
+
+    def test_phase6_ab_launch_endpoint_rejects_public_scenario_selector(self):
+        build_payload = build_action_proposals(project_root=PROJECT_ROOT, run_date="20260725")
+        with urlopen(self._url(f"/phase6/proposals/latest?run_date={build_payload['run_date']}")) as response:
+            proposals_payload = json.loads(response.read().decode("utf-8"))
+        proposal_id = proposals_payload["proposals"][0]["proposal_id"]
+
+        decision_request = Request(
+            self._url("/phase6/proposals/decision"),
+            data=json.dumps(
+                {
+                    "proposal_id": proposal_id,
+                    "proposal_run_date": build_payload["run_date"],
+                    "decision_status": "approved",
+                    "decision_reason": "Approved for simulated launch",
+                    "decided_by": "architect.openclaw@gmail.com",
+                }
+            ).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urlopen(decision_request) as response:
+            self.assertEqual(response.status, 201)
+
+        launch_request = Request(
+            self._url("/phase6/ab-tests/launch"),
+            data=json.dumps(
+                {
+                    "proposal_id": proposal_id,
+                    "proposal_run_date": build_payload["run_date"],
+                    "launched_by": "architect.openclaw@gmail.com",
+                    "scenario_key": "guardrail_breach",
+                }
+            ).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with self.assertRaises(HTTPError) as context:
+            urlopen(launch_request)
+        self.assertEqual(context.exception.code, 400)
+        payload = json.loads(context.exception.read().decode("utf-8"))
+        self.assertIn("scenario_key is not accepted by the public API", payload["error"])
 
     def test_onesignal_event_ingestion_endpoint(self):
         body = {

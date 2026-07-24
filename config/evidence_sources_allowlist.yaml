@@ -1,0 +1,123 @@
+{
+  "phase": "phase6",
+  "version": "2026-07-21",
+  "cadence": "monthly",
+  "open_access_only": true,
+  "source_levels": {
+    "A": {
+      "label": "peer_review_preprint_or_author_copy",
+      "confidence_ceiling": "high"
+    },
+    "B": {
+      "label": "institutional_research",
+      "confidence_ceiling": "high"
+    },
+    "C": {
+      "label": "public_consulting_insight",
+      "confidence_ceiling": "medium"
+    },
+    "D": {
+      "label": "industry_benchmark_or_vendor_content",
+      "confidence_ceiling": "low"
+    }
+  },
+  "approval": {
+    "mode": "dashboard",
+    "single_approver": "architect.openclaw@gmail.com",
+    "ab_mode": "simulated"
+  },
+  "seed_sources": [
+    {
+      "ref_id": "[1]",
+      "source_name": "CXL",
+      "source_level": "D",
+      "peer_review_status": "none",
+      "open_access_verified": true,
+      "used_in": ["INT-01"],
+      "seed_role": "baseline_reference",
+      "notes": "Conversion heuristics source inherited from Phase 5 static intervention catalog."
+    },
+    {
+      "ref_id": "[4]",
+      "source_name": "ResearchGate",
+      "source_level": "A",
+      "peer_review_status": "preprint",
+      "open_access_verified": true,
+      "used_in": ["INT-02"],
+      "seed_role": "baseline_reference",
+      "notes": "Open-access research distribution channel inherited from Phase 5 static intervention catalog."
+    },
+    {
+      "ref_id": "[11]",
+      "source_name": "Altcraft",
+      "source_level": "D",
+      "peer_review_status": "none",
+      "open_access_verified": true,
+      "used_in": ["INT-04"],
+      "seed_role": "baseline_reference",
+      "notes": "Industry benchmark source inherited from Phase 5 static intervention catalog."
+    },
+    {
+      "ref_id": "[13]",
+      "source_name": "Omnisend",
+      "source_level": "D",
+      "peer_review_status": "none",
+      "open_access_verified": true,
+      "used_in": ["INT-05"],
+      "seed_role": "expansion_candidate",
+      "notes": "Benchmark source relevant for timing/channel evidence."
+    },
+    {
+      "ref_id": "[15]",
+      "source_name": "Klaviyo",
+      "source_level": "D",
+      "peer_review_status": "none",
+      "open_access_verified": true,
+      "used_in": ["INT-06"],
+      "seed_role": "expansion_candidate",
+      "notes": "Vendor benchmark useful for actionability examples but capped by low confidence ceiling."
+    }
+  ],
+  "expansion_pool": [
+    {
+      "source_name": "SSRN",
+      "source_level": "A",
+      "peer_review_status": "preprint",
+      "open_access_verified": true,
+      "used_in": ["INT-01", "INT-02", "INT-04"],
+      "seed_role": "priority_expansion"
+    },
+    {
+      "source_name": "Google Scholar author PDF",
+      "source_level": "A",
+      "peer_review_status": "published",
+      "open_access_verified": true,
+      "used_in": ["INT-01", "INT-02", "INT-04"],
+      "seed_role": "priority_expansion"
+    },
+    {
+      "source_name": "Nielsen Norman Group",
+      "source_level": "B",
+      "peer_review_status": "none",
+      "open_access_verified": true,
+      "used_in": ["INT-01", "INT-06"],
+      "seed_role": "priority_expansion"
+    },
+    {
+      "source_name": "Baymard Institute public content",
+      "source_level": "B",
+      "peer_review_status": "none",
+      "open_access_verified": true,
+      "used_in": ["INT-01", "INT-05", "INT-06"],
+      "seed_role": "priority_expansion"
+    },
+    {
+      "source_name": "McKinsey Insights",
+      "source_level": "C",
+      "peer_review_status": "none",
+      "open_access_verified": true,
+      "used_in": ["INT-02", "INT-04"],
+      "seed_role": "priority_expansion"
+    }
+  ]
+}

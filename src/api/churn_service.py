@@ -16,6 +16,18 @@ import joblib
 import pandas as pd
 from sqlalchemy import create_engine, text
 
+from evidence.phase6_integration import (
+    build_action_proposals,
+    build_kpi_status_view,
+    build_n8n_action_payload,
+    launch_ab_test,
+    load_action_history,
+    load_action_proposals,
+    load_latest_kpi_status,
+    load_latest_n8n_action_payload,
+    record_action_decision,
+)
+
 logger = logging.getLogger(__name__)
 
 PROJECT_ROOT = Path(os.getenv("PROJECT_ROOT", Path(__file__).resolve().parents[2]))
@@ -462,6 +474,28 @@ def _load_agent_status() -> dict:
         governance_payload = json.load(handle)
 
     synthetic_actions = pd.read_parquet(SYNTHETIC_ACTIONS_PATH) if SYNTHETIC_ACTIONS_PATH.exists() else pd.DataFrame()
+    pending_human_decision_count = 0
+    shadow_log_count = 0
+    try:
+        _ensure_agent_decision_log_table()
+        with _ops_engine().connect() as conn:
+            shadow_log_count = int(
+                conn.execute(text("SELECT COUNT(*) FROM agent_decision_log WHERE shadow_mode = TRUE")).scalar_one()
+            )
+            pending_human_decision_count = int(
+                conn.execute(
+                    text(
+                        """
+                        SELECT COUNT(*)
+                        FROM agent_decision_log
+                        WHERE shadow_mode = TRUE
+                          AND (human_decision IS NULL OR TRIM(human_decision) = '')
+                        """
+                    )
+                ).scalar_one()
+            )
+    except Exception:
+        logger.exception("Unable to derive agent decision log counts")
     latest_cycle = None
     recent_cycle_summary: list[dict[str, Any]] = []
     if not synthetic_actions.empty and "campaign_cycle" in synthetic_actions.columns:
@@ -550,6 +584,9 @@ def _load_agent_status() -> dict:
         "status": "ok",
         "timestamp": _utc_now_iso(),
         "shadow_mode": True,
+        "decision_log_table": "agent_decision_log",
+        "pending_human_decision_count": pending_human_decision_count,
+        "shadow_log_count": shadow_log_count,
         "agent_action_required": agent_action_required,
         "recommended_decision_type": recommended_decision,
         "governance_run_date": governance_payload.get("run_date"),
@@ -736,6 +773,12 @@ def _refresh_shadow_monitor_artifacts(trigger: str, cycle_date: str | None = Non
 
 
 def _load_phase5_daily_status(refresh: bool = False) -> dict:
+    # Local import on purpose: `pipeline.phase5_daily_status` imports
+    # `pipeline.phase5_shadow_monitor`, and that module imports
+    # `_ensure_agent_decision_log_table` / `_load_agent_status` from this
+    # file (`api.churn_service`). Keeping the import inside the function
+    # avoids triggering that circular dependency during module import time
+    # and makes the dependency explicit for future readers.
     from pipeline.phase5_daily_status import (
         OUTPUT_JSON_PATH,
         OUTPUT_MARKDOWN_PATH,
@@ -758,6 +801,11 @@ def _load_phase5_daily_status(refresh: bool = False) -> dict:
 
 
 def _load_phase5_shadow_monitor_status(refresh: bool = False) -> dict:
+    # Local import on purpose: `pipeline.phase5_shadow_monitor` imports
+    # `_ensure_agent_decision_log_table` and `_load_agent_status` from this
+    # module. Importing it lazily here keeps the circular dependency from
+    # exploding at module import time and documents why this is not a
+    # top-level import.
     from pipeline.phase5_shadow_monitor import (
         OUTPUT_DIVERGENCES_PATH,
         OUTPUT_HTML_PATH,
@@ -1024,6 +1072,126 @@ class ChurnServiceHandler(BaseHTTPRequestHandler):
                 _json_response(self, HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
             return
 
+        if parsed.path == "/agent/status":
+            try:
+                payload = _load_agent_status()
+            except Exception as exc:  # pragma: no cover
+                logger.exception("Unexpected agent status error")
+                _json_response(self, HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
+                return
+            _json_response(self, HTTPStatus.OK, payload)
+            return
+
+        if parsed.path == "/agent/status/daily":
+            params = parse_qs(parsed.query)
+            refresh = params.get("refresh", ["false"])[0].lower() in {"1", "true", "yes"}
+            try:
+                payload = _load_phase5_daily_status(refresh=refresh)
+            except Exception as exc:  # pragma: no cover
+                logger.exception("Unexpected phase5 daily status error")
+                _json_response(self, HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
+                return
+            _json_response(self, HTTPStatus.OK, payload)
+            return
+
+        if parsed.path == "/agent/status/shadow-monitor":
+            params = parse_qs(parsed.query)
+            refresh = params.get("refresh", ["false"])[0].lower() in {"1", "true", "yes"}
+            try:
+                payload = _load_phase5_shadow_monitor_status(refresh=refresh)
+            except Exception as exc:  # pragma: no cover
+                logger.exception("Unexpected phase5 shadow monitor error")
+                _json_response(self, HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
+                return
+            _json_response(self, HTTPStatus.OK, payload)
+            return
+
+        if parsed.path == "/agent/status/phase5":
+            params = parse_qs(parsed.query)
+            refresh = params.get("refresh", ["false"])[0].lower() in {"1", "true", "yes"}
+            try:
+                payload = _load_phase5_operational_snapshot(refresh=refresh)
+            except Exception as exc:  # pragma: no cover
+                logger.exception("Unexpected phase5 operational snapshot error")
+                _json_response(self, HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
+                return
+            _json_response(self, HTTPStatus.OK, payload)
+            return
+
+        if parsed.path == "/phase6/proposals/latest":
+            params = parse_qs(parsed.query)
+            run_date = params.get("run_date", [None])[0]
+            refresh_value = params.get("refresh", ["false"])[0].lower()
+            refresh = refresh_value in {"1", "true", "yes"}
+            try:
+                if refresh:
+                    payload = build_action_proposals(project_root=PROJECT_ROOT, run_date=run_date)
+                    proposals = load_action_proposals(PROJECT_ROOT, payload["run_date"])
+                    response_payload = {**payload, "proposals": proposals, "refreshed": True}
+                else:
+                    proposals = load_action_proposals(PROJECT_ROOT, run_date)
+                    effective_run_date = run_date or proposals[0]["proposal_run_date"] if proposals else run_date
+                    response_payload = {
+                        "run_date": effective_run_date,
+                        "proposal_count": len(proposals),
+                        "proposals": proposals,
+                        "refreshed": False,
+                    }
+            except FileNotFoundError as exc:
+                _json_response(self, HTTPStatus.NOT_FOUND, {"error": str(exc)})
+                return
+            except ValueError as exc:
+                _json_response(self, HTTPStatus.BAD_REQUEST, {"error": str(exc)})
+                return
+            except Exception as exc:  # pragma: no cover
+                logger.exception("Unexpected Phase 6 proposal error")
+                _json_response(self, HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
+                return
+            _json_response(self, HTTPStatus.OK, response_payload)
+            return
+
+        if parsed.path == "/phase6/action-history/latest":
+            try:
+                history = load_action_history(PROJECT_ROOT)
+            except Exception as exc:  # pragma: no cover
+                logger.exception("Unexpected Phase 6 action-history error")
+                _json_response(self, HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
+                return
+            _json_response(
+                self,
+                HTTPStatus.OK,
+                {"status": "ok", "record_count": len(history), "records": history, "timestamp": _utc_now_iso()},
+            )
+            return
+
+        if parsed.path == "/phase6/kpis/latest":
+            params = parse_qs(parsed.query)
+            refresh = params.get("refresh", ["false"])[0].lower() in {"1", "true", "yes"}
+            try:
+                payload = build_kpi_status_view(PROJECT_ROOT) if refresh else load_latest_kpi_status(PROJECT_ROOT)
+            except Exception as exc:  # pragma: no cover
+                logger.exception("Unexpected Phase 6 KPI status error")
+                _json_response(self, HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
+                return
+            _json_response(self, HTTPStatus.OK, payload)
+            return
+
+        if parsed.path == "/phase6/n8n-payload/latest":
+            params = parse_qs(parsed.query)
+            run_date = params.get("run_date", [None])[0]
+            refresh = params.get("refresh", ["false"])[0].lower() in {"1", "true", "yes"}
+            try:
+                payload = build_n8n_action_payload(PROJECT_ROOT, run_date=run_date) if refresh else load_latest_n8n_action_payload(PROJECT_ROOT)
+            except FileNotFoundError as exc:
+                _json_response(self, HTTPStatus.NOT_FOUND, {"error": str(exc)})
+                return
+            except Exception as exc:  # pragma: no cover
+                logger.exception("Unexpected Phase 6 n8n payload error")
+                _json_response(self, HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
+                return
+            _json_response(self, HTTPStatus.OK, payload)
+            return
+
         _json_response(self, HTTPStatus.NOT_FOUND, {"error": "Not found"})
 
     def do_POST(self) -> None:
@@ -1041,6 +1209,78 @@ class ChurnServiceHandler(BaseHTTPRequestHandler):
                 return
 
             _json_response(self, HTTPStatus.CREATED, response_payload)
+            return
+
+        if parsed.path == "/phase6/proposals/decision":
+            try:
+                payload = _read_json_body(self)
+                response_payload = record_action_decision(payload, project_root=PROJECT_ROOT)
+            except ValueError as exc:
+                _json_response(self, HTTPStatus.BAD_REQUEST, {"error": str(exc)})
+                return
+            except Exception as exc:  # pragma: no cover
+                logger.exception("Unexpected Phase 6 proposal decision error")
+                _json_response(self, HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
+                return
+            _json_response(self, HTTPStatus.CREATED, response_payload)
+            return
+
+        if parsed.path == "/phase6/ab-tests/launch":
+            try:
+                payload = _read_json_body(self)
+                if "scenario_key" in payload:
+                    raise ValueError("scenario_key is not accepted by the public API")
+                response_payload = launch_ab_test(payload, project_root=PROJECT_ROOT)
+            except ValueError as exc:
+                _json_response(self, HTTPStatus.BAD_REQUEST, {"error": str(exc)})
+                return
+            except Exception as exc:  # pragma: no cover
+                logger.exception("Unexpected Phase 6 A/B launch error")
+                _json_response(self, HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
+                return
+            _json_response(self, HTTPStatus.CREATED, response_payload)
+            return
+
+        if parsed.path == "/agent/decisions/shadow":
+            try:
+                payload = _read_json_body(self)
+                response_payload = _create_shadow_decision(payload, refresh_artifacts=True, refresh_trigger="shadow_create")
+            except ValueError as exc:
+                _json_response(self, HTTPStatus.BAD_REQUEST, {"error": str(exc)})
+                return
+            except Exception as exc:  # pragma: no cover
+                logger.exception("Unexpected shadow decision create error")
+                _json_response(self, HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
+                return
+            _json_response(self, HTTPStatus.CREATED, response_payload)
+            return
+
+        if parsed.path == "/agent/decisions/shadow/run":
+            try:
+                payload = _read_json_body(self)
+                response_payload = _run_shadow_decision_cycle(payload)
+            except ValueError as exc:
+                _json_response(self, HTTPStatus.BAD_REQUEST, {"error": str(exc)})
+                return
+            except Exception as exc:  # pragma: no cover
+                logger.exception("Unexpected shadow decision run error")
+                _json_response(self, HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
+                return
+            _json_response(self, HTTPStatus.CREATED, response_payload)
+            return
+
+        if parsed.path == "/agent/decisions/shadow/reconcile":
+            try:
+                payload = _read_json_body(self)
+                response_payload = _reconcile_shadow_decision(payload)
+            except ValueError as exc:
+                _json_response(self, HTTPStatus.BAD_REQUEST, {"error": str(exc)})
+                return
+            except Exception as exc:  # pragma: no cover
+                logger.exception("Unexpected shadow decision reconcile error")
+                _json_response(self, HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(exc)})
+                return
+            _json_response(self, HTTPStatus.OK, response_payload)
             return
 
         if parsed.path != "/coupons/generate":
